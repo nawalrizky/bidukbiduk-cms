@@ -88,6 +88,13 @@ export interface ChatbotResponse {
   timestamp?: string;
 }
 
+export interface ChatbotContent {
+  id?: number;
+  content: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Auth Types
 export interface User {
   id: string;

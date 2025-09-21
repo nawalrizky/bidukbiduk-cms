@@ -3,9 +3,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Send, Bot, User } from 'lucide-react'
-import { sendChatbotMessage } from '@/lib/api/chatbot'
-import { ChatbotMessage } from '@/lib/types'
+import { Send, Bot, User, Edit, Check, X } from 'lucide-react'
+import { sendChatbotMessage, getChatbotContent, updateChatbotContent } from '@/lib/api/chatbot'
+import { ChatbotMessage, ChatbotContent } from '@/lib/types'
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState<ChatbotMessage[]>([])
@@ -14,6 +14,13 @@ export default function ChatbotPage() {
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // New state for content management
+  const [chatbotContent, setChatbotContent] = useState<ChatbotContent | null>(null)
+  const [isEditingContent, setIsEditingContent] = useState(false)
+  const [editContentValue, setEditContentValue] = useState('')
+  const [contentLoading, setContentLoading] = useState(false)
+  const [contentError, setContentError] = useState<string | null>(null)
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -21,6 +28,65 @@ export default function ChatbotPage() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    loadChatbotContent()
+  }, [])
+
+  const loadChatbotContent = async () => {
+    try {
+      setContentLoading(true)
+      setContentError(null)
+      const content = await getChatbotContent()
+      setChatbotContent(content)
+      setEditContentValue(content.content)
+    } catch (err) {
+      setContentError('Failed to load chatbot content')
+      console.error('Error loading chatbot content:', err)
+    } finally {
+      setContentLoading(false)
+    }
+  }
+
+  const handleEditContent = () => {
+    setIsEditingContent(true)
+    // Set the full content when entering edit mode
+    setEditContentValue(chatbotContent?.content || '')
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditingContent(false)
+    setEditContentValue(chatbotContent?.content || '')
+    setContentError(null)
+  }
+
+  // Function to trim content for display
+  const getTrimmedContent = (content: string, maxLength: number = 1000) => {
+    if (content.length <= maxLength) {
+      return content
+    }
+    return content.substring(0, maxLength) + '...'
+  }
+
+  // Check if content is trimmed
+  const isContentTrimmed = (content: string, maxLength: number = 1000) => {
+    return content.length > maxLength
+  }
+
+  const handleSaveContent = async () => {
+    try {
+      setContentLoading(true)
+      setContentError(null)
+      const updatedContent = await updateChatbotContent(editContentValue)
+      setChatbotContent(updatedContent)
+      setIsEditingContent(false)
+    } catch (err) {
+      setContentError('Failed to update chatbot content')
+      console.error('Error updating chatbot content:', err)
+    } finally {
+      setContentLoading(false)
+    }
+  }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,7 +160,7 @@ export default function ChatbotPage() {
         )}
       </div>
 
-      <Card className="h-[600px] flex flex-col">
+      <Card className="min-h-[700px] flex flex-col">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Bot className="h-5 w-5 text-blue-600" />
@@ -102,9 +168,90 @@ export default function ChatbotPage() {
           </CardTitle>
         </CardHeader>
         
-        <CardContent className="flex-1 flex flex-col">
+        <CardContent className="flex-1 justify-between flex flex-col">
+          {/* Data Input Section */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold">Data Input</h3>
+              <div className="flex space-x-2">
+                {isEditingContent ? (
+                  <>
+                    <Button 
+                      size="sm" 
+                      onClick={handleSaveContent}
+                      disabled={contentLoading}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      {contentLoading ? 'Saving...' : 'Save'}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={handleCancelEdit}
+                      disabled={contentLoading}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={handleEditContent}
+                    disabled={contentLoading}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {contentError && (
+              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {contentError}
+              </div>
+            )}
+            
+            <div className="border rounded-lg p-3 bg-gray-50">
+              {contentLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="ml-2 text-gray-600">Loading content...</span>
+                </div>
+              ) : isEditingContent ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={editContentValue}
+                    onChange={(e) => setEditContentValue(e.target.value)}
+                    className="w-full h-32 p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter chatbot training content..."
+                  />
+                  <div className="text-xs text-gray-500 text-right">
+                    {editContentValue.length} characters
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div 
+                    className="min-h-[8rem] p-2 text-gray-700 whitespace-pre-wrap cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={handleEditContent}
+                  >
+                    {chatbotContent?.content ? getTrimmedContent(chatbotContent.content) : 'Click to add chatbot training content...'}
+                  </div>
+                  {chatbotContent?.content && isContentTrimmed(chatbotContent.content) && (
+                    <div className="text-xs text-gray-500 text-right">
+                      Click Edit to view full content.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[400px]">
+          <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[300px]">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <Bot className="h-12 w-12 text-gray-400 mb-4" />

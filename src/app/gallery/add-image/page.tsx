@@ -35,7 +35,7 @@ export default function AddImagePage() {
   const [formData, setFormData] = useState<CreateGalleryItem>({
     title: '',
     description: '',
-    category: 2, // Default category
+    category: 1, // Default category
     file: '',
     tags: '',
     is_featured: true, // Default to featured

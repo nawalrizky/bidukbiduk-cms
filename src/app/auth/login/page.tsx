@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, LogIn, User, Lock } from 'lucide-react'
@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,7 +24,7 @@ export default function LoginPage() {
     setError('')
     setIsLoading(true)
 
-    const result = await login(username, password)
+    const result = await login(username, password, rememberMe)
     
     if (result.success) {
       router.push('/gallery')
@@ -102,6 +103,8 @@ export default function LoginPage() {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-600">Ingat saya</span>

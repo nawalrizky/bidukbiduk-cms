@@ -50,10 +50,15 @@ export interface Destination {
   name: string;
   description: string;
   category: DestinationCategory;
+  category_id: number;
   location: string;
-  coordinates: string;
+  latitude: string;
+  longitude: string;
   images: string;
+  facilities: string;
+  operating_hours: string;
   entrance_fee: string;
+  contact_info: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -62,11 +67,15 @@ export interface Destination {
 export interface CreateDestination {
   name: string;
   description: string;
-  category: number;
+  category_id: number;
   location: string;
-  coordinates: string;
-  images: string;
+  latitude: string;
+  longitude: string;
+  images?: string | File[];
+  facilities: string;
+  operating_hours: string;
   entrance_fee: string;
+  contact_info: string;
   is_active: boolean;
 }
 
@@ -84,7 +93,8 @@ export interface ChatbotMessage {
 }
 
 export interface ChatbotResponse {
-  response: string;
+  reply: string;
+  session_id: string;
   timestamp?: string;
 }
 
@@ -147,8 +157,155 @@ export interface ApiResponse<T> {
 }
 
 export interface PaginatedResponse<T> {
-  results: T[];
-  count: number;
-  next: string | null;
-  previous: string | null;
+  success: boolean;
+  message: string;
+  data: T[];
+  pagination: {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    page_size: number;
+    current_page: number;
+    total_pages: number;
+  };
+}
+
+// Package types
+export interface Package {
+  package_id: number;
+  name: string;
+  price: string;
+  description?: string;
+  image?: string;
+  image_url: string;
+  is_active: boolean;
+  ratings?: PackageRating[];
+  total_rating: number;
+  total_rating_users: number;
+  destinations?: PackageDestination[];
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PackageDestination {
+  id: number;
+  name: string;
+  location: string;
+  description: string;
+}
+
+export interface CreatePackage {
+  name: string;
+  price: string;
+  description?: string;
+  image_url?: string;
+  is_active?: boolean;
+  total_rating?: number;
+  total_rating_users?: number;
+  destinations?: number[]; // Array of destination IDs
+}
+
+export interface UpdatePackage extends CreatePackage {
+  package_id?: number;
+}
+
+export interface PackageRating {
+  id: number;
+  package_id: number;
+  user_id: number;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreatePackageRating {
+  package_id: number;
+  rating: number;
+  comment?: string;
+}
+
+export interface UpdatePackageRating {
+  rating: number;
+  comment?: string;
+}
+
+export interface PackageStats {
+  total_packages: number;
+  active_packages: number;
+  inactive_packages: number;
+  average_price: string;
+  total_destinations: number;
+  total_ratings: number;
+  average_rating: number;
+}
+
+// Hotel Types
+export interface Hotel {
+  hotel_id: number;
+  name: string;
+  price: string;
+  description?: string;
+  image_url?: string;
+  image?: string;
+  images?: Array<{
+    id: number;
+    image_url: string;
+    created_at: string;
+  }> | string[];
+  book_url?: string;
+  maps_url?: string;
+  is_active: boolean;
+  total_rating: number;
+  total_rating_users: number;
+  ratings?: HotelRating[];
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface CreateHotel {
+  name: string;
+  description?: string;
+  price: string;
+  book_url?: string;
+  maps_url?: string;
+  total_rating?: number;
+  total_rating_users?: number;
+  image?: File;
+  images?: File[];
+  is_active?: boolean;
+}
+
+export interface UpdateHotel extends CreateHotel {
+  hotel_id?: number;
+}
+
+export interface HotelRating {
+  id: number;
+  hotel_id: number;
+  user_id: number;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateHotelRating {
+  hotel_id: number;
+  rating: number;
+  comment?: string;
+}
+
+export interface UpdateHotelRating {
+  rating: number;
+  comment?: string;
+}
+
+export interface HotelStats {
+  total_hotels: number;
+  active_hotels: number;
+  inactive_hotels: number;
+  average_price: string;
+  total_ratings: number;
+  average_rating: number;
 }

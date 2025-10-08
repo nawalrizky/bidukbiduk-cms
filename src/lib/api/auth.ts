@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { CookieManager } from '@/lib/utils/cookies'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
 
@@ -16,6 +17,7 @@ const authApi = axios.create({
 export interface LoginRequest {
   username: string
   password: string
+  rememberMe?: boolean
 }
 
 export interface RegisterRequest {
@@ -58,14 +60,21 @@ export interface User {
   email?: string
   full_name?: string
   phone_number?: string
+  token?: string
 }
 
 // Auth API functions
 export const authService = {
     // Login
-  async login(credentials: LoginRequest): Promise<LoginResult> {
+  async login(username: string, password: string, rememberMe: boolean = false): Promise<LoginResult> {
     try {
-      const response = await authApi.post('/auth/login', credentials)
+      const response = await authApi.post('/auth/login', { username, password })
+      
+      // Store auth data with new token structure
+      if (response.data) {
+        this.storeAuthData(response.data, rememberMe)
+      }
+      
       return {
         success: true,
         data: response.data
@@ -168,16 +177,23 @@ export const authService = {
     }
   },
 
-  // Logout
+  // Logout - clear all auth data
   logout(): void {
     console.log('Logging out user')
     
     if (typeof window !== 'undefined') {
+      // Clear all storage methods
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
       
-      // Also remove cookies
+      sessionStorage.removeItem('auth_token')
+      sessionStorage.removeItem('user_data')
+      
+      CookieManager.deleteCookie('auth_token')
+      CookieManager.deleteCookie('user_data')
+      
+      // Also remove old cookies for compatibility
       if (typeof document !== 'undefined') {
         document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
         document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
@@ -185,22 +201,54 @@ export const authService = {
     }
   },
 
-  // Get current user
+  // Clear invalid auth data
+  clearInvalidData(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user')
+      sessionStorage.removeItem('user_data')
+      CookieManager.deleteCookie('user_data')
+    }
+  },
+
+  // Get current user (check cookies first, then sessionStorage, then localStorage for compatibility)
   getCurrentUser(): User | null {
     if (typeof window !== 'undefined') {
       try {
-        const userStr = localStorage.getItem('user')
-        console.log('Raw user data from localStorage:', userStr)
+        // Check cookies first (persistent login)
+        let userStr = CookieManager.getCookie('user_data')
+        if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+          const userData = JSON.parse(userStr)
+          return {
+            id: userData.user_id.toString(),
+            username: userData.username,
+            email: userData.email,
+            full_name: userData.full_name
+          }
+        }
         
-        // Check if userStr exists and is not 'undefined' string
+        // Check sessionStorage (session login)
+        userStr = sessionStorage.getItem('user_data')
+        if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+          const userData = JSON.parse(userStr)
+          return {
+            id: userData.user_id.toString(),
+            username: userData.username,
+            email: userData.email,
+            full_name: userData.full_name
+          }
+        }
+        
+        // Fallback to localStorage for compatibility
+        userStr = localStorage.getItem('user')
         if (userStr && userStr !== 'undefined' && userStr !== 'null') {
           return JSON.parse(userStr)
         }
+        
         return null
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error)
+        console.error('Error parsing user data:', error)
         // Clear invalid data
-        localStorage.removeItem('user')
+        this.clearInvalidData()
         return null
       }
     }
@@ -218,18 +266,40 @@ export const authService = {
   },
 
   // Store auth data
-  storeAuthData(authResponse: AuthResponse): void {
-    console.log('Storing auth data:', authResponse)
+  storeAuthData(authResponse: AuthResponse, rememberMe: boolean = false): void {
+    console.log('Storing auth data:', authResponse, 'Remember me:', rememberMe)
     
     if (typeof window !== 'undefined') {
       try {
-        // Store the token as access_token
-        localStorage.setItem('access_token', authResponse.token)
-        if (authResponse.refresh) {
-          localStorage.setItem('refresh_token', authResponse.refresh)
+        // Use the token from the response (current API structure)
+        const token = authResponse.token
+        
+        if (rememberMe) {
+          // Store in cookies for persistent login (30 days)
+          CookieManager.setCookie('auth_token', token, 30)
+          CookieManager.setCookie('user_data', JSON.stringify({
+            user_id: authResponse.user_id,
+            username: authResponse.username,
+            email: authResponse.email,
+            full_name: authResponse.full_name,
+            last_login: authResponse.last_login
+          }), 30)
+          console.log('Auth data stored in cookies for 30 days')
+        } else {
+          // Store in sessionStorage for session-only login
+          sessionStorage.setItem('auth_token', token)
+          sessionStorage.setItem('user_data', JSON.stringify({
+            user_id: authResponse.user_id,
+            username: authResponse.username,
+            email: authResponse.email,
+            full_name: authResponse.full_name,
+            last_login: authResponse.last_login
+          }))
+          console.log('Auth data stored in sessionStorage')
         }
         
-        // Create user object from response
+        // Also store in localStorage for compatibility (will be removed later)
+        localStorage.setItem('access_token', token)
         const user: User = {
           id: authResponse.user_id.toString(),
           username: authResponse.username,
@@ -238,14 +308,6 @@ export const authService = {
         }
         localStorage.setItem('user', JSON.stringify(user))
         
-        // Also set cookies for SSR middleware
-        if (typeof document !== 'undefined') {
-          document.cookie = `access_token=${authResponse.token}; path=/; max-age=86400; SameSite=strict`
-          if (authResponse.refresh) {
-            document.cookie = `refresh_token=${authResponse.refresh}; path=/; max-age=604800; SameSite=strict`
-          }
-        }
-        
         console.log('Auth data stored successfully')
       } catch (error) {
         console.error('Error storing auth data:', error)
@@ -253,10 +315,23 @@ export const authService = {
     }
   },
 
-  // Get access token
+  // Get access token (check cookies first, then sessionStorage, then localStorage for compatibility)
   getAccessToken(): string | null {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('access_token')
+      // Check cookies first (persistent login)
+      let token = CookieManager.getCookie('auth_token')
+      if (token && token !== 'undefined' && token !== 'null') {
+        return token
+      }
+      
+      // Check sessionStorage (session login)
+      token = sessionStorage.getItem('auth_token')
+      if (token && token !== 'undefined' && token !== 'null') {
+        return token
+      }
+      
+      // Fallback to localStorage for compatibility
+      token = localStorage.getItem('access_token')
       return (token && token !== 'undefined' && token !== 'null') ? token : null
     }
     return null

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal'
 import { Plus, Trash2, Camera } from 'lucide-react'
 import { getGalleryItems, deleteGalleryItem } from '@/lib/api/gallery'
 import { GalleryItem } from '@/lib/types'
@@ -15,8 +16,9 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [itemToDelete, setItemToDelete] = useState<GalleryItem | null>(null)
+  
+  // Use the delete modal hook
+  const deleteModal = useDeleteModal()
 
   useEffect(() => {
     loadGalleryItems()
@@ -73,21 +75,19 @@ export default function GalleryPage() {
   }
 
   const handleDeleteClick = (item: GalleryItem) => {
-    setItemToDelete(item)
-    setShowDeleteModal(true)
+    deleteModal.openModal(item.id, item.title)
   }
 
   const handleDelete = async () => {
-    if (!itemToDelete) return
+    if (!deleteModal.itemToDelete) return
 
     try {
       setDeleting(true)
       setError(null)
       
-      await deleteGalleryItem(itemToDelete.id)
-      setGalleryItems(items => items.filter(item => item.id !== itemToDelete.id))
-      setShowDeleteModal(false)
-      setItemToDelete(null)
+      await deleteGalleryItem(Number(deleteModal.itemToDelete.id))
+      setGalleryItems(items => items.filter(item => item.id !== deleteModal.itemToDelete!.id))
+      deleteModal.closeModal()
     } catch (err) {
       setError('Failed to delete item')
       console.error('Error deleting item:', err)
@@ -228,54 +228,14 @@ export default function GalleryPage() {
       )}
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && itemToDelete && (
-        <div 
-          className="fixed inset-0 backdrop-blur-[2px] bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => {
-            setShowDeleteModal(false)
-            setItemToDelete(null)
-          }}
-        >
-          <div 
-            className="bg-white shadow-xl rounded-lg p-6 max-w-md w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold mb-4">Delete Gallery Item</h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete &ldquo;{itemToDelete.title}&rdquo;? This action cannot be undone.
-            </p>
-            <div className="flex space-x-4 justify-end">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setShowDeleteModal(false)
-                  setItemToDelete(null)
-                }}
-                disabled={deleting}
-              >
-                Cancel
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={handleDelete}
-                disabled={deleting}
-              >
-                {deleting ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onConfirm={handleDelete}
+        itemName={deleteModal.itemToDelete?.name || ''}
+        itemType="Gallery Item"
+        isDeleting={deleting}
+      />
     </div>
   )
 }

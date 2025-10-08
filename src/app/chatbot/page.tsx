@@ -106,9 +106,17 @@ export default function ChatbotPage() {
     try {
       const response = await sendChatbotMessage(inputMessage)
       
+      // Log the reply message
+      console.log('Chatbot reply received:', {
+        userMessage: inputMessage,
+        botResponse: response.reply,
+        timestamp: response.timestamp || new Date().toISOString(),
+        fullResponse: response
+      })
+      
       const botMessage: ChatbotMessage = {
         userMessage: inputMessage,
-        botResponse: response.response,
+        botResponse: response.reply,
         timestamp: response.timestamp || new Date().toISOString()
       }
 
@@ -121,6 +129,14 @@ export default function ChatbotPage() {
     } catch (err) {
       setError('Failed to send message')
       console.error('Error sending message:', err)
+      
+      // Log the error reply message
+      console.log('Chatbot error reply:', {
+        userMessage: inputMessage,
+        botResponse: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date().toISOString(),
+        error: err
+      })
       
       // Add error message to chat
       const errorMessage: ChatbotMessage = {

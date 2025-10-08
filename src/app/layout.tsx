@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { NotificationProvider, NotificationContainer } from '@/contexts/NotificationContext'
 
 export const metadata: Metadata = {
   title: "CMS Dashboard",
@@ -17,9 +18,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <AdminLayout>
-            {children}
-          </AdminLayout>
+          <NotificationProvider>
+            <AdminLayout>
+              {children}
+            </AdminLayout>
+            <NotificationContainer />
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

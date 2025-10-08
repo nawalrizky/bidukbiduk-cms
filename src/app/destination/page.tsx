@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -12,7 +13,8 @@ import {
   EyeOff, 
   Edit, 
   Trash2,
-  ExternalLink
+  ExternalLink,
+  FolderOpen
 } from 'lucide-react';
 import { 
   getDestinations, 
@@ -22,6 +24,7 @@ import {
 import { Destination, DestinationCategory } from '@/lib/types';
 
 export default function DestinationPage() {
+  const router = useRouter();
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [categories, setCategories] = useState<DestinationCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +44,7 @@ export default function DestinationPage() {
         getDestinationCategoriesList()
       ]);
       
-      setDestinations(destinationsResponse.results || []);
+      setDestinations(destinationsResponse.data || []);
       setCategories(categoriesData);
     } catch (error) {
       console.error('Error loading destinations:', error);
@@ -109,10 +112,23 @@ export default function DestinationPage() {
             Manage travel destinations and locations ({destinations.length} total)
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Add Destination</span>
-        </Button>
+        <div className="flex items-center space-x-3">
+          <Button 
+            variant="outline"
+            className="flex items-center space-x-2"
+            onClick={() => router.push('/destination/categories')}
+          >
+            <FolderOpen className="h-4 w-4" />
+            <span>Manage Categories</span>
+          </Button>
+          <Button 
+            className="flex items-center space-x-2"
+            onClick={() => router.push('/destination/add-destination')}
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Destination</span>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -165,10 +181,7 @@ export default function DestinationPage() {
         <span>
           Showing {filteredDestinations.length} of {destinations.length} destinations
         </span>
-        <div className="flex items-center space-x-4">
-          <span>{destinations.filter(d => d.is_active).length} active</span>
-          <span>{destinations.filter(d => !d.is_active).length} inactive</span>
-        </div>
+       
       </div>
 
       {/* Destinations Grid */}
@@ -207,7 +220,11 @@ export default function DestinationPage() {
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => router.push(`/destination/edit-destination/${destination.id}`)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button 
@@ -238,8 +255,13 @@ export default function DestinationPage() {
                   )}
                 </div>
 
-                {destination.coordinates && (
-                  <Button variant="outline" size="sm" className="w-full">
+                {(destination.latitude && destination.longitude) && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => window.open(`https://www.openstreetmap.org/#map=15/${destination.latitude}/${destination.longitude}`, '_blank')}
+                  >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     View on Map
                   </Button>

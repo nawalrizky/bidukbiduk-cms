@@ -190,7 +190,7 @@ export default function PackagePage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPackages.map((pkg) => (
-            <Card key={pkg.package_id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={pkg.package_id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
               {/* Package Image - Clickable to view details */}
               <div 
                 className="aspect-video bg-gray-200 relative cursor-pointer"
@@ -220,8 +220,8 @@ export default function PackagePage() {
                 </div>
               </div>
 
-              <div className="p-4">
-                <div className="space-y-3">
+              <div className="p-4 flex flex-col flex-1">
+                <div className="flex-1 space-y-3">
                   {/* Package Name and Price */}
                   <div>
                     <h3 
@@ -275,31 +275,31 @@ export default function PackagePage() {
                       </div>
                     )}
                   </div>
+                </div>
 
-                  {/* Actions */}
-                  <div className="flex space-x-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => router.push(`/package/edit-package/${pkg.package_id}`)}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(pkg.package_id, pkg.name)}
-                      disabled={deleteLoading === pkg.package_id}
-                    >
-                      {deleteLoading === pkg.package_id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                {/* Actions */}
+                <div className="flex space-x-2 pt-4 mt-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => router.push(`/package/edit-package/${pkg.package_id}`)}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(pkg.package_id, pkg.name)}
+                    disabled={deleteLoading === pkg.package_id}
+                  >
+                    {deleteLoading === pkg.package_id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
             </Card>

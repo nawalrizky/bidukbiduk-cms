@@ -1,77 +1,206 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   TrendingUp,
+  TrendingDown,
   Calendar,
   Download,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
+import { getInstagramAnalytics } from '@/lib/api/instagram';
+import { useNotifications } from '@/contexts/NotificationContext';
 
-// Mock data - in a real app, this would come from an API
-const MOCK_DATA = {
-  currentFollowers: 711217,
-  followerChange: 27607,
-  followerChangePercent: 3.89,
-  maxFollowerChange: 3507,
-  maxChangeDate: 'Oct 18, 2021',
-  avgFollowerChange: 8.87,
-  
-  followerHistory: [
-    { date: '1 OCT', followers: 683610 },
-    { date: '3 OCT', followers: 685200 },
-    { date: '5 OCT', followers: 687500 },
-    { date: '7 OCT', followers: 689691 },
-    { date: '9 OCT', followers: 692800 },
-    { date: '11 OCT', followers: 695200 },
-    { date: '13 OCT', followers: 697500 },
-    { date: '15 OCT', followers: 699800 },
-    { date: '17 OCT', followers: 702300 },
-    { date: '19 OCT', followers: 705800 },
-    { date: '21 OCT', followers: 707600 },
-    { date: '23 OCT', followers: 708900 },
-    { date: '25 OCT', followers: 709800 },
-    { date: '27 OCT', followers: 710500 },
-    { date: '29 OCT', followers: 711217 },
-  ],
-  
-  gainedLostData: [
-    { date: '1 OCT', gained: 800, lost: 200 },
-    { date: '3 OCT', gained: 1200, lost: 300 },
-    { date: '5 OCT', gained: 1100, lost: 250 },
-    { date: '7 OCT', gained: 450, lost: 150 },
-    { date: '9 OCT', gained: 3200, lost: 400 },
-    { date: '11 OCT', gained: 1900, lost: 350 },
-    { date: '13 OCT', gained: 800, lost: 200 },
-    { date: '15 OCT', gained: 450, lost: 150 },
-    { date: '17 OCT', gained: 950, lost: 180 },
-    { date: '19 OCT', gained: 1600, lost: 280 },
-    { date: '21 OCT', gained: 1200, lost: 350 },
-    { date: '23 OCT', gained: 1800, lost: 300 },
-    { date: '25 OCT', gained: 4500, lost: 650 },
-    { date: '27 OCT', gained: 2200, lost: 450 },
-    { date: '29 OCT', gained: 1100, lost: 280 },
-    { date: '1 NOV', gained: 1500, lost: 320 },
-    { date: '3 NOV', gained: 1750, lost: 410 },
-    { date: '5 NOV', gained: 3100, lost: 380 },
-    { date: '7 NOV', gained: 900, lost: 220 },
-    { date: '9 NOV', gained: 1050, lost: 280 },
-    { date: '11 NOV', gained: 950, lost: 240 },
-    { date: '13 NOV', gained: 1850, lost: 420 },
-    { date: '15 NOV', gained: 1100, lost: 310 },
-  ],
-};
+interface AnalyticsData {
+  id: number;
+  username: string;
+  full_name: string;
+  follower: number;
+  following: number;
+  media_count: number;
+  total_like: number;
+  total_comment: number;
+  avg_engagement_rate: number;
+  snapshot_date: string;
+  created_at: string;
+}
+
+type ViewType = 'daily' | 'weekly' | 'monthly';
 
 export default function SocmedAnalyticsPage() {
-  const [dateRange] = useState('October 1, 2021 - October 30, 2021');
-  const [viewType, setViewType] = useState('Day');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [viewType, setViewType] = useState<ViewType>('daily');
+  const { addNotification } = useNotifications();
 
-  // Calculate max value for chart scaling
-  const maxFollowers = Math.max(...MOCK_DATA.followerHistory.map(d => d.followers));
-  const minFollowers = Math.min(...MOCK_DATA.followerHistory.map(d => d.followers));
-  const maxGained = Math.max(...MOCK_DATA.gainedLostData.map(d => d.gained));
+  const loadAnalytics = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getInstagramAnalytics();
+      setAnalyticsData(response.data);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+      addNotification({
+        type: 'error',
+        title: 'Failed to load analytics',
+        message: 'Unable to load Instagram analytics data'
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [addNotification]);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, [loadAnalytics]);
+
+  // Calculate metrics based on view type
+  const calculateMetrics = () => {
+    if (analyticsData.length === 0) return null;
+
+    const sortedData = [...analyticsData].sort((a, b) => 
+      new Date(b.snapshot_date).getTime() - new Date(a.snapshot_date).getTime()
+    );
+
+    const latest = sortedData[0];
+    
+    let comparisonIndex = 1; // Default: compare with previous day
+    if (viewType === 'weekly') {
+      comparisonIndex = Math.min(7, sortedData.length - 1);
+    } else if (viewType === 'monthly') {
+      comparisonIndex = Math.min(30, sortedData.length - 1);
+    }
+    
+    const previous = sortedData[comparisonIndex];
+    
+    const followerChange = latest.follower - previous.follower;
+    const followerChangePercent = previous.follower > 0 
+      ? ((followerChange / previous.follower) * 100).toFixed(2)
+      : '0';
+
+    // Find max follower change
+    let maxChange = 0;
+    let maxChangeDate = '';
+    for (let i = 0; i < sortedData.length - 1; i++) {
+      const change = sortedData[i].follower - sortedData[i + 1].follower;
+      if (change > maxChange) {
+        maxChange = change;
+        maxChangeDate = sortedData[i].snapshot_date;
+      }
+    }
+
+    // Calculate average daily change
+    const totalDays = sortedData.length - 1;
+    const totalChange = latest.follower - sortedData[sortedData.length - 1].follower;
+    const avgChange = totalDays > 0 ? (totalChange / totalDays).toFixed(2) : '0';
+
+    return {
+      currentFollowers: latest.follower,
+      followerChange,
+      followerChangePercent: parseFloat(followerChangePercent),
+      maxFollowerChange: maxChange,
+      maxChangeDate,
+      avgFollowerChange: parseFloat(avgChange),
+      currentEngagement: latest.avg_engagement_rate,
+      currentLikes: latest.total_like,
+      currentComments: latest.total_comment,
+      currentPosts: latest.media_count
+    };
+  };
+
+  const metrics = calculateMetrics();
+
+  // Prepare chart data
+  const getChartData = () => {
+    const sortedData = [...analyticsData].sort((a, b) => 
+      new Date(a.snapshot_date).getTime() - new Date(b.snapshot_date).getTime()
+    );
+
+    if (viewType === 'daily') {
+      return sortedData.slice(-30); // Last 30 days
+    } else if (viewType === 'weekly') {
+      // Group by week
+      const weekly: AnalyticsData[] = [];
+      for (let i = 0; i < sortedData.length; i += 7) {
+        const weekData = sortedData.slice(i, i + 7);
+        if (weekData.length > 0) {
+          weekly.push(weekData[weekData.length - 1]);
+        }
+      }
+      return weekly;
+    } else {
+      // Monthly - take one data point per month
+      const monthly: AnalyticsData[] = [];
+      let currentMonth = '';
+      sortedData.forEach(data => {
+        const month = data.snapshot_date.substring(0, 7);
+        if (month !== currentMonth) {
+          monthly.push(data);
+          currentMonth = month;
+        }
+      });
+      return monthly;
+    }
+  };
+
+  const chartData = getChartData();
+
+  // Calculate gained/lost data
+  const getGainedLostData = () => {
+    const sortedData = [...analyticsData].sort((a, b) => 
+      new Date(a.snapshot_date).getTime() - new Date(b.snapshot_date).getTime()
+    );
+
+    const result = [];
+    for (let i = 1; i < sortedData.length; i++) {
+      const change = sortedData[i].follower - sortedData[i - 1].follower;
+      result.push({
+        date: sortedData[i].snapshot_date,
+        gained: change > 0 ? change : 0,
+        lost: change < 0 ? Math.abs(change) : 0
+      });
+    }
+    return result.slice(-30);
+  };
+
+  const gainedLostData = getGainedLostData();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading analytics data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!metrics) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-gray-600">No analytics data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  const maxFollowers = Math.max(...chartData.map(d => d.follower));
+  const minFollowers = Math.min(...chartData.map(d => d.follower));
+  const maxGained = Math.max(...gainedLostData.map(d => Math.max(d.gained, d.lost)));
+  const maxEngagement = Math.max(...chartData.map(d => d.avg_engagement_rate));
+  const minEngagement = Math.min(...chartData.map(d => d.avg_engagement_rate));
+
+  // Helper function to format large numbers
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
+    return num.toString();
+  };
 
   return (
     <div className="space-y-6">
@@ -79,7 +208,7 @@ export default function SocmedAnalyticsPage() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Social Media Analytics</h1>
-          <p className="text-gray-600">Track and analyze your social media performance</p>
+          <p className="text-gray-600">Track and analyze your Instagram performance</p>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm">
@@ -92,112 +221,155 @@ export default function SocmedAnalyticsPage() {
         </div>
       </div>
 
-      {/* Date Range Selector */}
+      {/* View Type Selector */}
       <div className="flex items-center space-x-4">
-        <Button variant="outline" className="justify-between min-w-[300px]">
-          <div className="flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
-            {dateRange}
-          </div>
-          <ChevronDown className="h-4 w-4 ml-2" />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Calendar className="h-4 w-4 text-gray-500" />
+          <span className="text-sm text-gray-600">View by:</span>
+        </div>
         <div className="flex border rounded-md">
-          {['Day', 'Week', 'Month'].map((type) => (
-            <button
-              key={type}
-              onClick={() => setViewType(type)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                viewType === type
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {type}
-            </button>
-          ))}
+          <button
+            onClick={() => setViewType('daily')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              viewType === 'daily'
+                ? 'bg-blue-50 text-blue-600 rounded-l-md'
+                : 'text-gray-600 hover:bg-gray-50 hover:rounded-l-md'
+            }`}
+          >
+            Daily
+          </button>
+          <button
+            onClick={() => setViewType('weekly')}
+            className={`px-4 py-2 text-sm font-medium transition-colors border-x ${
+              viewType === 'weekly'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Weekly
+          </button>
+          <button
+            onClick={() => setViewType('monthly')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              viewType === 'monthly'
+                ? 'bg-blue-50 text-blue-600 rounded-r-md'
+                : 'text-gray-600 hover:bg-gray-50 hover:rounded-r-md'
+            }`}
+          >
+            Monthly
+          </button>
         </div>
       </div>
 
       {/* Audience Section */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Audience</h2>
-        <div className="grid grid-cols-1 gap-4 mb-6">
-          <div className="flex space-x-4">
-            {/* Followers Card */}
-            <Card className="flex-1 p-6">
-              <div className="text-sm text-gray-600 mb-1">Followers</div>
-              <div className="text-3xl font-bold mb-2">
-                {MOCK_DATA.currentFollowers.toLocaleString()}
-              </div>
-            </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {/* Followers Card */}
+          <Card className="p-6">
+            <div className="text-sm text-gray-600 mb-1">Followers</div>
+            <div className="text-3xl font-bold mb-2">
+              {metrics.currentFollowers.toLocaleString()}
+            </div>
+          </Card>
 
-            {/* Follower Change Card */}
-            <Card className="flex-1 p-6">
-              <div className="text-sm text-gray-600 mb-1">Follower Change</div>
-              <div className="flex items-baseline space-x-2 mb-2">
-                <span className="text-3xl font-bold text-green-600">
-                  {MOCK_DATA.followerChange.toLocaleString()}
-                </span>
-                <span className="flex items-center text-green-600 text-sm font-medium">
+          {/* Follower Change Card */}
+          <Card className="p-6">
+            <div className="text-sm text-gray-600 mb-1">Follower Change</div>
+            <div className="flex items-baseline space-x-2 mb-2">
+              <span className={`text-3xl font-bold ${
+                metrics.followerChange >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {metrics.followerChange >= 0 ? '+' : ''}{metrics.followerChange.toLocaleString()}
+              </span>
+              <span className={`flex items-center text-sm font-medium ${
+                metrics.followerChange >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {metrics.followerChange >= 0 ? (
                   <TrendingUp className="h-4 w-4 mr-1" />
-                  {MOCK_DATA.followerChangePercent}%
-                </span>
-              </div>
-            </Card>
+                ) : (
+                  <TrendingDown className="h-4 w-4 mr-1" />
+                )}
+                {Math.abs(metrics.followerChangePercent)}%
+              </span>
+            </div>
+          </Card>
 
-            {/* Max Follower Change Card */}
-            <Card className="flex-1 p-6">
-              <div className="text-sm text-gray-600 mb-1">Max. Follower Change</div>
-              <div className="text-3xl font-bold mb-1">
-                {MOCK_DATA.maxFollowerChange.toLocaleString()}
-              </div>
-              <div className="text-xs text-gray-500">{MOCK_DATA.maxChangeDate}</div>
-            </Card>
+          {/* Max Follower Change Card */}
+          <Card className="p-6">
+            <div className="text-sm text-gray-600 mb-1">Max. Follower Change</div>
+            <div className="text-3xl font-bold mb-1">
+              {metrics.maxFollowerChange.toLocaleString()}
+            </div>
+            <div className="text-xs text-gray-500">
+              {new Date(metrics.maxChangeDate).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </div>
+          </Card>
 
-            {/* Avg Follower Change Card */}
-            <Card className="flex-1 p-6">
-              <div className="text-sm text-gray-600 mb-1">Avg. Follower Change</div>
-              <div className="text-3xl font-bold">
-                +{MOCK_DATA.avgFollowerChange}
-              </div>
-            </Card>
-          </div>
+          {/* Avg Follower Change Card */}
+          <Card className="p-6">
+            <div className="text-sm text-gray-600 mb-1">Avg. Follower Change</div>
+            <div className="text-3xl font-bold">
+              {metrics.avgFollowerChange >= 0 ? '+' : ''}{metrics.avgFollowerChange}
+            </div>
+          </Card>
         </div>
+         {/* Additional Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4">Posts</h3>
+          <div className="text-2xl font-bold">{metrics.currentPosts}</div>
+          <p className="text-sm text-gray-500 mt-1">Total media posts</p>
+        </Card>
+        
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4">Total Engagement</h3>
+          <div className="text-2xl font-bold">
+            {(metrics.currentLikes + metrics.currentComments).toLocaleString()}
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            {metrics.currentLikes.toLocaleString()} likes, {metrics.currentComments.toLocaleString()} comments
+          </p>
+        </Card>
+      </div>
 
         {/* Followers Chart */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
-              <h3 className="font-semibold">Followers</h3>
-              <span className="text-sm text-gray-500">
-                Oct 1, 2021 → Oct 30, 2021
-              </span>
-            </div>
-            <Button variant="outline" size="sm">
-              CSV
-            </Button>
+            <h3 className="font-semibold">Followers Growth</h3>
+            
           </div>
           
-          {/* Line Chart */}
           <div className="relative h-64">
-            <svg className="w-full h-full" viewBox="0 0 900 200" preserveAspectRatio="none">
+            <svg className="w-full h-full" viewBox="0 0 900 220" preserveAspectRatio="none">
               {/* Y-axis labels */}
-              <text x="10" y="15" className="text-xs fill-gray-500">715k</text>
-              <text x="10" y="50" className="text-xs fill-gray-500">710k</text>
-              <text x="10" y="85" className="text-xs fill-gray-500">705k</text>
-              <text x="10" y="120" className="text-xs fill-gray-500">700k</text>
-              <text x="10" y="155" className="text-xs fill-gray-500">695k</text>
-              <text x="10" y="190" className="text-xs fill-gray-500">690k</text>
-              <text x="10" y="200" className="text-xs fill-gray-500">685k</text>
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const value = maxFollowers - (i * (maxFollowers - minFollowers) / 5);
+                return (
+                  <text 
+                    key={i} 
+                    x="5" 
+                    y={i * 40 + 15} 
+                    className="text-xs fill-gray-500"
+                    fontSize="12"
+                  >
+                    {formatNumber(Math.round(value))}
+                  </text>
+                );
+              })}
               
               {/* Grid lines */}
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              {[0, 1, 2, 3, 4, 5].map((i) => (
                 <line
                   key={i}
                   x1="60"
-                  y1={i * 33}
-                  x2="900"
-                  y2={i * 33}
+                  y1={i * 40 + 10}
+                  x2="890"
+                  y2={i * 40 + 10}
                   stroke="#f0f0f0"
                   strokeWidth="1"
                 />
@@ -208,17 +380,17 @@ export default function SocmedAnalyticsPage() {
                 fill="none"
                 stroke="#3b82f6"
                 strokeWidth="2"
-                points={MOCK_DATA.followerHistory.map((d, i) => {
-                  const x = 60 + (i * (840 / (MOCK_DATA.followerHistory.length - 1)));
-                  const y = 200 - ((d.followers - minFollowers) / (maxFollowers - minFollowers)) * 180;
+                points={chartData.map((d, i) => {
+                  const x = 60 + (i * (830 / Math.max(1, chartData.length - 1)));
+                  const y = 210 - ((d.follower - minFollowers) / Math.max(1, maxFollowers - minFollowers)) * 180;
                   return `${x},${y}`;
                 }).join(' ')}
               />
               
-              {/* Hover points */}
-              {MOCK_DATA.followerHistory.map((d, i) => {
-                const x = 60 + (i * (840 / (MOCK_DATA.followerHistory.length - 1)));
-                const y = 200 - ((d.followers - minFollowers) / (maxFollowers - minFollowers)) * 180;
+              {/* Data points */}
+              {chartData.map((d, i) => {
+                const x = 60 + (i * (830 / Math.max(1, chartData.length - 1)));
+                const y = 210 - ((d.follower - minFollowers) / Math.max(1, maxFollowers - minFollowers)) * 180;
                 return (
                   <circle
                     key={i}
@@ -227,15 +399,21 @@ export default function SocmedAnalyticsPage() {
                     r="3"
                     fill="#3b82f6"
                     className="hover:r-5 cursor-pointer"
-                  />
+                  >
+                    <title>{`${d.snapshot_date}: ${d.follower.toLocaleString()} followers`}</title>
+                  </circle>
                 );
               })}
             </svg>
             
-            {/* X-axis labels */}
-            <div className="flex justify-between mt-2 px-12 text-xs text-gray-500">
-              {MOCK_DATA.followerHistory.filter((_, i) => i % 2 === 0).map((d, i) => (
-                <span key={i}>{d.date}</span>
+            <div className="flex justify-between px-12 text-xs text-gray-500">
+              {chartData.filter((_, i) => i % Math.ceil(chartData.length / 8) === 0).map((d, i) => (
+                <span key={i}>
+                  {new Date(d.snapshot_date).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </span>
               ))}
             </div>
           </div>
@@ -245,103 +423,202 @@ export default function SocmedAnalyticsPage() {
       {/* Gained and Lost Followers Chart */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            <h3 className="font-semibold">Gained and Lost Followers</h3>
-            <span className="text-sm text-gray-500">
-              Oct 1, 2021 → Oct 30, 2021
-            </span>
-          </div>
-          <Button variant="outline" size="sm">
-            CSV
-          </Button>
+          <h3 className="font-semibold">Gained and Lost Followers</h3>
+     
         </div>
         
-        {/* Bar Chart */}
         <div className="relative h-64">
-          <svg className="w-full h-full" viewBox="0 0 900 250" preserveAspectRatio="none">
+          <svg className="w-full h-full" viewBox="0 0 900 270" preserveAspectRatio="none">
             {/* Y-axis labels */}
-            <text x="10" y="15" className="text-xs fill-gray-500">5k</text>
-            <text x="10" y="55" className="text-xs fill-gray-500">4k</text>
-            <text x="10" y="95" className="text-xs fill-gray-500">3k</text>
-            <text x="10" y="135" className="text-xs fill-gray-500">2k</text>
-            <text x="10" y="175" className="text-xs fill-gray-500">1k</text>
-            <text x="10" y="215" className="text-xs fill-gray-500">0</text>
-            <text x="10" y="245" className="text-xs fill-gray-500">-1k</text>
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => {
+              const value = maxGained - (i * maxGained / 3);
+              return (
+                <text 
+                  key={i} 
+                  x="5" 
+                  y={i * 40 + 15} 
+                  className="text-xs fill-gray-500"
+                  fontSize="12"
+                >
+                  {i === 3 ? '0' : (i < 3 ? '+' : '-')}{formatNumber(Math.abs(Math.round(value)))}
+                </text>
+              );
+            })}
             
             {/* Grid lines */}
             {[0, 1, 2, 3, 4, 5, 6].map((i) => (
               <line
                 key={i}
                 x1="60"
-                y1={i * 40}
-                x2="900"
-                y2={i * 40}
+                y1={i * 40 + 10}
+                x2="890"
+                y2={i * 40 + 10}
                 stroke="#f0f0f0"
                 strokeWidth="1"
               />
             ))}
             
+            {/* Zero line */}
+            <line
+              x1="60"
+              y1="130"
+              x2="890"
+              y2="130"
+              stroke="#666"
+              strokeWidth="1"
+            />
+            
             {/* Bars */}
-            {MOCK_DATA.gainedLostData.map((d, i) => {
-              const x = 60 + (i * (840 / MOCK_DATA.gainedLostData.length));
-              const barWidth = 25;
-              const gainedHeight = (d.gained / maxGained) * 120;
-              const lostHeight = (d.lost / maxGained) * 120;
+            {gainedLostData.map((d, i) => {
+              const x = 60 + (i * (830 / gainedLostData.length));
+              const barWidth = Math.max(8, 830 / gainedLostData.length - 2);
+              const gainedHeight = (d.gained / Math.max(1, maxGained)) * 110;
+              const lostHeight = (d.lost / Math.max(1, maxGained)) * 110;
               
               return (
                 <g key={i}>
                   {/* Gained (blue bar) */}
                   <rect
                     x={x}
-                    y={215 - gainedHeight}
+                    y={130 - gainedHeight}
                     width={barWidth}
                     height={gainedHeight}
                     fill="#3b82f6"
                     className="hover:opacity-80 cursor-pointer"
-                  />
+                  >
+                    <title>{`${d.date}: +${d.gained} followers`}</title>
+                  </rect>
                   {/* Lost (red bar) */}
                   <rect
                     x={x}
-                    y={215}
+                    y={130}
                     width={barWidth}
                     height={lostHeight}
                     fill="#ef4444"
                     className="hover:opacity-80 cursor-pointer"
-                  />
+                  >
+                    <title>{`${d.date}: -${d.lost} followers`}</title>
+                  </rect>
                 </g>
               );
             })}
           </svg>
           
-          {/* X-axis labels */}
-          <div className="flex justify-between mt-2 px-12 text-xs text-gray-500">
-            {MOCK_DATA.gainedLostData.filter((_, i) => i % 2 === 0).map((d, i) => (
-              <span key={i}>{d.date}</span>
+          <div className="flex justify-between px-12 text-xs text-gray-500">
+            {gainedLostData.filter((_, i) => i % Math.ceil(gainedLostData.length / 8) === 0).map((d, i) => (
+              <span key={i}>
+                {new Date(d.date).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </span>
             ))}
           </div>
         </div>
       </Card>
 
-      {/* Additional Sections Placeholder */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold mb-4">Posts</h3>
-          <div className="text-2xl font-bold">127</div>
-          <p className="text-sm text-gray-500 mt-1">Total posts this period</p>
-        </Card>
+     
+
+      {/* Engagement Rate Chart */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold">Average Engagement Rate</h3>
+   
+        </div>
         
-        <Card className="p-6">
-          <h3 className="font-semibold mb-4">Stories</h3>
-          <div className="text-2xl font-bold">43</div>
-          <p className="text-sm text-gray-500 mt-1">Stories posted</p>
-        </Card>
-        
-        <Card className="p-6">
-          <h3 className="font-semibold mb-4">Engagement Rate</h3>
-          <div className="text-2xl font-bold">4.2%</div>
-          <p className="text-sm text-gray-500 mt-1">Average engagement</p>
-        </Card>
-      </div>
+        <div className="relative h-64">
+          <svg className="w-full h-full" viewBox="0 0 900 220" preserveAspectRatio="none">
+            {/* Y-axis labels */}
+            {[0, 1, 2, 3, 4, 5].map((i) => {
+              const value = maxEngagement - (i * (maxEngagement - minEngagement) / 5);
+              return (
+                <text 
+                  key={i} 
+                  x="5" 
+                  y={i * 40 + 15} 
+                  className="text-xs fill-gray-500"
+                  fontSize="12"
+                >
+                  {value.toFixed(1)}%
+                </text>
+              );
+            })}
+            
+            {/* Grid lines */}
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <line
+                key={i}
+                x1="60"
+                y1={i * 40 + 10}
+                x2="890"
+                y2={i * 40 + 10}
+                stroke="#f0f0f0"
+                strokeWidth="1"
+              />
+            ))}
+            
+            {/* Area under line */}
+            <polygon
+              fill="url(#engagementGradient)"
+              opacity="0.3"
+              points={`60,210 ${chartData.map((d, i) => {
+                const x = 60 + (i * (830 / Math.max(1, chartData.length - 1)));
+                const y = 210 - ((d.avg_engagement_rate - minEngagement) / Math.max(1, maxEngagement - minEngagement)) * 180;
+                return `${x},${y}`;
+              }).join(' ')} ${60 + ((chartData.length - 1) * (830 / Math.max(1, chartData.length - 1)))},210`}
+            />
+            
+            {/* Gradient definition */}
+            <defs>
+              <linearGradient id="engagementGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#10b981', stopOpacity: 0 }} />
+              </linearGradient>
+            </defs>
+            
+            {/* Line path */}
+            <polyline
+              fill="none"
+              stroke="#10b981"
+              strokeWidth="2"
+              points={chartData.map((d, i) => {
+                const x = 60 + (i * (830 / Math.max(1, chartData.length - 1)));
+                const y = 210 - ((d.avg_engagement_rate - minEngagement) / Math.max(1, maxEngagement - minEngagement)) * 180;
+                return `${x},${y}`;
+              }).join(' ')}
+            />
+            
+            {/* Data points */}
+            {chartData.map((d, i) => {
+              const x = 60 + (i * (830 / Math.max(1, chartData.length - 1)));
+              const y = 210 - ((d.avg_engagement_rate - minEngagement) / Math.max(1, maxEngagement - minEngagement)) * 180;
+              return (
+                <circle
+                  key={i}
+                  cx={x}
+                  cy={y}
+                  r="3"
+                  fill="#10b981"
+                  className="hover:r-5 cursor-pointer"
+                >
+                  <title>{`${d.snapshot_date}: ${d.avg_engagement_rate.toFixed(2)}% engagement`}</title>
+                </circle>
+              );
+            })}
+          </svg>
+          
+          <div className="flex justify-between  px-12 text-xs text-gray-500">
+            {chartData.filter((_, i) => i % Math.ceil(chartData.length / 8) === 0).map((d, i) => (
+              <span key={i}>
+                {new Date(d.snapshot_date).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

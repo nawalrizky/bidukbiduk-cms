@@ -309,3 +309,49 @@ export interface HotelStats {
   total_ratings: number;
   average_rating: number;
 }
+
+// Article/News Types
+export interface Article {
+  id: number;
+  title: string;
+  content: string;
+  featured_image?: string;
+  featured_image_url: string;
+  category: number;
+  category_name?: string;
+  tags?: string;
+  tags_list?: string[];
+  status: 'draft' | 'published' | 'archived';
+  publish_date?: string;
+  author: number;
+  author_name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateArticle {
+  title: string;
+  content: string;
+  featured_image?: File;
+  category: number;
+  tags?: string;
+  status?: 'draft' | 'published' | 'archived';
+  publish_date?: string;
+}
+
+export interface UpdateArticle extends CreateArticle {
+  id?: number;
+}
+
+export interface ArticleCategory {
+  id: number;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateArticleCategory {
+  name: string;
+  description?: string;
+}

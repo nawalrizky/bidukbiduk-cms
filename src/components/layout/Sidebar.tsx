@@ -14,7 +14,8 @@ import {
   MessageCircle,
   Map,
   LogOut,
-  X
+  X,
+  FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,11 @@ const navigation = [
     name: 'Gallery',
     href: '/gallery',
     icon: Camera,
+  },
+  {
+    name: 'Articles',
+    href: '/articles',
+    icon: FileText,
   },
   {
     name: 'Socmed Analytics',

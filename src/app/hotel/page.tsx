@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal'
-import { Plus, Search, Filter, Star, Eye, Edit, Trash2, Loader2, Building } from 'lucide-react'
+import { Plus, Search, Filter, Star, Edit, Trash2, Loader2, Building } from 'lucide-react'
 import { getHotels, deleteHotel } from '@/lib/api/hotels'
 import { Hotel } from '@/lib/types'
 import { useNotifications } from '@/contexts/NotificationContext'
@@ -185,97 +185,106 @@ export default function HotelPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredHotels.map((hotel) => (
-            <Card key={hotel.hotel_id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative aspect-video">
-                {hotel.images && hotel.images.length > 0 ? (
-                  (() => {
-                    const firstImage = hotel.images[0];
-                    const imageUrl = typeof firstImage === 'string' 
-                      ? firstImage 
-                      : firstImage?.image_url;
-                    
-                    return imageUrl?.trim() ? (
-                      <>
+            <Card key={hotel.hotel_id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+              {/* Hotel Image - Clickable to view details */}
+              <Link href={`/hotel/${hotel.hotel_id}`}>
+                <div className="aspect-video bg-gray-200 relative cursor-pointer">
+                  {hotel.images && hotel.images.length > 0 ? (
+                    (() => {
+                      const firstImage = hotel.images[0];
+                      const imageUrl = typeof firstImage === 'string' 
+                        ? firstImage 
+                        : firstImage?.image_url;
+                      
+                      return imageUrl?.trim() ? (
                         <Image
                           src={imageUrl}
                           alt={hotel.name}
                           fill
                           className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
-                        {hotel.images.length > 1 && (
-                          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                            +{hotel.images.length - 1} more
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <Building className="h-12 w-12 text-gray-400" />
-                      </div>
-                    );
-                  })()
-                ) : (
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <Building className="h-12 w-12 text-gray-400" />
-                  </div>
-                )}
-                {!hotel.is_active && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                    Inactive
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg line-clamp-1">{hotel.name}</h3>
-                  {hotel.total_rating_users > 0 ? (
-                    <div className="flex items-center space-x-1 text-yellow-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="text-sm font-medium">{hotel.total_rating.toFixed(1)}</span>
-                      <span className="text-xs text-gray-500">({hotel.total_rating_users})</span>
-                    </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <Building className="h-12 w-12 text-gray-400" />
+                        </div>
+                      );
+                    })()
                   ) : (
-                    <div className="flex items-center space-x-1 text-gray-400">
-                      <Star className="h-4 w-4" />
-                      <span className="text-xs">No reviews</span>
+                    <div className="flex items-center justify-center h-full">
+                      <Building className="h-12 w-12 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="absolute top-2 right-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      hotel.is_active 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-gray-100 text-gray-800"
+                    }`}>
+                      {hotel.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                  {hotel.images && hotel.images.length > 1 && (
+                    <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      +{hotel.images.length - 1} more
                     </div>
                   )}
                 </div>
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-lg font-bold text-green-600">
-                    Rp {parseFloat(hotel.price).toLocaleString('id-ID')}
-                    <span className="text-sm text-gray-500 font-normal">/night</span>
+              </Link>
+              
+              <div className="p-4 flex flex-col flex-1">
+                <div className="flex-1 space-y-3">
+                  {/* Hotel Name and Price */}
+                  <div>
+                    <Link href={`/hotel/${hotel.hotel_id}`}>
+                      <h3 className="font-semibold text-lg cursor-pointer hover:text-blue-600 transition-colors">
+                        {hotel.name}
+                      </h3>
+                    </Link>
+                    <p className="text-2xl font-bold text-green-600">
+                      Rp {parseFloat(hotel.price).toLocaleString('id-ID')}
+                      <span className="text-sm text-gray-500 font-normal">/night</span>
+                    </p>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="flex items-center space-x-2">
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                    <span className="text-sm text-gray-600">
+                      {hotel.total_rating_users > 0 ? (
+                        <>
+                          {hotel.total_rating.toFixed(1)} ({hotel.total_rating_users} reviews)
+                        </>
+                      ) : (
+                        'No reviews yet'
+                      )}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center">
-                  <div className="flex space-x-1">
-                    <Link href={`/hotel/${hotel.hotel_id}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Link href={`/hotel/edit-hotel/${hotel.hotel_id}`}>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(hotel.hotel_id, hotel.name)}
-                      disabled={deleteLoading === hotel.hotel_id}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      {deleteLoading === hotel.hotel_id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                {/* Actions */}
+                <div className="flex space-x-2 pt-4 mt-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => window.location.href = `/hotel/edit-hotel/${hotel.hotel_id}`}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(hotel.hotel_id, hotel.name)}
+                    disabled={deleteLoading === hotel.hotel_id}
+                  >
+                    {deleteLoading === hotel.hotel_id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
             </Card>

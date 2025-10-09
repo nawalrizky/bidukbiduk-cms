@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal';
 import { 
   Plus, 
   Search, 
@@ -14,7 +15,8 @@ import {
   Edit, 
   Trash2,
   ExternalLink,
-  FolderOpen
+  FolderOpen,
+  Loader2
 } from 'lucide-react';
 import { 
   getDestinations, 
@@ -22,18 +24,24 @@ import {
   deleteDestination 
 } from '@/lib/api/destinations';
 import { Destination, DestinationCategory } from '@/lib/types';
+import { useNotifications } from '@/contexts/NotificationContext';
 
 export default function DestinationPage() {
   const router = useRouter();
+  const { addNotification } = useNotifications();
+  const deleteModal = useDeleteModal();
+  
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [categories, setCategories] = useState<DestinationCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [showActiveOnly, setShowActiveOnly] = useState(false);
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadData = async () => {
@@ -48,20 +56,46 @@ export default function DestinationPage() {
       setCategories(categoriesData);
     } catch (error) {
       console.error('Error loading destinations:', error);
+      addNotification({
+        type: 'error',
+        title: 'Failed to load destinations',
+        message: 'Unable to load destinations. Please try again.'
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this destination?')) return;
+  const handleDelete = (id: number, name: string) => {
+    deleteModal.openModal(id, name);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.itemToDelete) return;
     
     try {
-      await deleteDestination(id);
-      await loadData(); // Reload data
-    } catch (error) {
+      setDeleteLoading(Number(deleteModal.itemToDelete.id));
+      await deleteDestination(Number(deleteModal.itemToDelete.id));
+      
+      addNotification({
+        type: 'success',
+        title: 'Destination Deleted',
+        message: `Destination "${deleteModal.itemToDelete.name}" has been deleted successfully`
+      });
+      
+      deleteModal.closeModal();
+      await loadData();
+    } catch (error: unknown) {
       console.error('Error deleting destination:', error);
-      alert('Failed to delete destination');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      addNotification({
+        type: 'error',
+        title: 'Failed to delete destination',
+        message: errorMessage
+      });
+    } finally {
+      setDeleteLoading(null);
+      deleteModal.closeModal();
     }
   };
 
@@ -230,10 +264,15 @@ export default function DestinationPage() {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => handleDelete(destination.id)}
+                      onClick={() => handleDelete(destination.id, destination.name)}
+                      disabled={deleteLoading === destination.id}
                       className="text-red-600 hover:text-red-700"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {deleteLoading === destination.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -271,6 +310,16 @@ export default function DestinationPage() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.closeModal}
+        onConfirm={confirmDelete}
+        itemName={deleteModal.itemToDelete?.name || ''}
+        itemType="Destination"
+        isDeleting={deleteLoading !== null}
+      />
     </div>
   );
 }

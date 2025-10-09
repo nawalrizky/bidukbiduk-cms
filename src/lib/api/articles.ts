@@ -189,5 +189,29 @@ export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
 // Create article category
 export const createArticleCategory = async (data: CreateArticleCategory): Promise<ArticleCategory> => {
   const response = await api.post('/articles/categories/', data);
+  
+  // Handle different response structures
+  if (response.data.data && typeof response.data.data === 'object') {
+    return response.data.data;
+  }
+  
   return response.data;
+};
+
+// Update article category
+export const updateArticleCategory = async (id: number, data: CreateArticleCategory): Promise<ArticleCategory> => {
+  const response = await api.put(`/articles/categories/${id}/`, data);
+  
+  // Handle different response structures
+  if (response.data.data && typeof response.data.data === 'object') {
+    return response.data.data;
+  }
+  
+  return response.data;
+};
+
+// Delete article category
+export const deleteArticleCategory = async (id: number): Promise<void> => {
+  await api.delete(`/articles/categories/${id}/`);
+  console.log('Article category deleted:', id);
 };

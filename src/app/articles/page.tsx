@@ -141,10 +141,19 @@ export default function ArticlesPage() {
           <h1 className="text-3xl font-bold tracking-tight">News & Articles</h1>
           <p className="text-gray-600">Manage news articles and blog posts</p>
         </div>
-        <Button onClick={() => router.push('/articles/add-article')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Article
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline"
+            onClick={() => router.push('/articles/categories')}
+          >
+            <Tag className="mr-2 h-4 w-4" />
+            Manage Categories
+          </Button>
+          <Button onClick={() => router.push('/articles/add-article')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add New Article
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filter */}

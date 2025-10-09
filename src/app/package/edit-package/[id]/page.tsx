@@ -192,9 +192,9 @@ export default function EditPackagePage({
       submitData.append("total_rating", formData.total_rating);
       submitData.append("total_rating_users", formData.total_rating_users);
       
-      // Add destinations
+      // Add destination IDs - send each ID individually
       formData.destination_ids.forEach(id => {
-        submitData.append("destinations", id.toString());
+        submitData.append("destination_ids", id.toString());
       });
 
       // Add image if selected (new image)

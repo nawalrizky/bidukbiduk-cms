@@ -55,7 +55,6 @@ export default function EditDestinationPage() {
     location: "",
     latitude: "",
     longitude: "",
-    facilities: "",
     operating_hours: "",
     entrance_fee: "",
     contact_info: "",
@@ -94,7 +93,6 @@ export default function EditDestinationPage() {
             location: destination.location || "",
             latitude: latitude,
             longitude: longitude,
-            facilities: Array.isArray(destination.facilities) ? destination.facilities.join(", ") : destination.facilities || "",
             operating_hours: Array.isArray(destination.operating_hours) ? destination.operating_hours.join(", ") : destination.operating_hours || "",
             entrance_fee: destination.entrance_fee || "",
             contact_info: destination.contact_info || "",
@@ -471,19 +469,7 @@ export default function EditDestinationPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Additional Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="facilities">
-                  Facilities
-                  
-                </Label>
-                <Textarea
-                  id="facilities"
-                  value={formData.facilities}
-                  onChange={(e) => handleInputChange("facilities", e.target.value)}
-                  placeholder="e.g., Parking, Restaurant, Toilet"
-                  rows={3}
-                />
-              </div>
+              
               <div>
                 <Label htmlFor="operating_hours">
                   Operating Hours

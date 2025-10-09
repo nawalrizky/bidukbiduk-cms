@@ -49,7 +49,6 @@ export default function AddDestinationPage() {
     location: "",
     latitude: "",
     longitude: "",
-    facilities: "",
     operating_hours: "",
     entrance_fee: "",
     contact_info: "",
@@ -185,7 +184,7 @@ export default function AddDestinationPage() {
             submitData.append(key, value.toString());
           }
           // Convert certain fields to JSON arrays if they contain text
-          else if (key === 'facilities' || key === 'operating_hours') {
+          else if (key === 'operating_hours') {
             if (value.toString().trim()) {
               // If the field has content, wrap it in a JSON array
               const jsonValue = JSON.stringify([value.toString()]);
@@ -223,7 +222,7 @@ export default function AddDestinationPage() {
         } else {
           console.log(`${key}: ${value}`);
           // Show JSON conversion for specific fields
-          if (key === 'facilities' || key === 'operating_hours') {
+          if (key === 'operating_hours') {
             console.log(`  → JSON converted from: "${formData[key as keyof CreateDestination]}"`);
           }
         }
@@ -530,22 +529,6 @@ export default function AddDestinationPage() {
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div className="md:col-span-2">
-                <Label htmlFor="facilities">Facilities</Label>
-                <Textarea
-                  id="facilities"
-                  value={formData.facilities}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    handleInputChange("facilities", e.target.value)
-                  }
-                  placeholder="List available facilities (parking, restroom, restaurant, etc.)"
-                  rows={3}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter facilities description (will be stored as structured data)
-                </p>
               </div>
             </div>
           </Card>

@@ -72,7 +72,6 @@ export interface CreateDestination {
   latitude: string;
   longitude: string;
   images?: string | File[];
-  facilities: string;
   operating_hours: string;
   entrance_fee: string;
   contact_info: string;

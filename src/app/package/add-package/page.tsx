@@ -164,9 +164,9 @@ export default function AddPackagePage() {
       submitData.append("total_rating", formData.total_rating);
       submitData.append("total_rating_users", formData.total_rating_users);
       
-      // Add destinations
+      // Add destination IDs - send each ID individually
       formData.destination_ids.forEach(id => {
-        submitData.append("destinations", id.toString());
+        submitData.append("destination_ids", id.toString());
       });
 
       // Add image if selected
@@ -175,6 +175,7 @@ export default function AddPackagePage() {
       }
 
       console.log("Form data before submission:");
+      console.log("Destination IDs:", formData.destination_ids);
       for (const [key, value] of submitData.entries()) {
         if (value instanceof File) {
           console.log(`  ${key}: File(${value.name}, ${value.size} bytes)`);

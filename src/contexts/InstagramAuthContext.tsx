@@ -52,7 +52,7 @@ export function InstagramAuthProvider({ children }: { children: React.ReactNode 
       setLoading(true);
       
       // Call the Instagram login API endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/instagram/sessions/login/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/instagram/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

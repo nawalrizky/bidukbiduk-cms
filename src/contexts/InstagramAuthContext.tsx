@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNotifications } from './NotificationContext';
+import { authService } from '@/lib/api/auth';
 
 interface InstagramSession {
   id: number;
@@ -51,21 +52,48 @@ export function InstagramAuthProvider({ children }: { children: React.ReactNode 
     try {
       setLoading(true);
       
+      // Get the CMS authentication token using authService
+      const token = authService.getAccessToken();
+      
+      console.log('Instagram login attempt:');
+      console.log('- Username:', username);
+      console.log('- CMS Token present:', !!token);
+      console.log('- API URL:', `${process.env.NEXT_PUBLIC_API_BASE_URL}/instagram/login/`);
+      
+      if (!token) {
+        throw new Error('You must be logged into the CMS first');
+      }
+      
       // Call the Instagram login API endpoint
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/instagram/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
         },
         body: JSON.stringify({ username, password }),
       });
 
+      console.log('Instagram login response status:', response.status);
+      console.log('Instagram login response headers:', response.headers);
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to login to Instagram');
+        console.error('Instagram login error response:', errorData);
+        console.error('Error details:', JSON.stringify(errorData, null, 2));
+        
+        // Try to extract a meaningful error message
+        const errorMessage = errorData.message || 
+                            errorData.error || 
+                            errorData.detail ||
+                            (errorData.errors ? JSON.stringify(errorData.errors) : '') ||
+                            'Failed to login to Instagram';
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log('Instagram login success response:', data);
       
       // Store session data
       const sessionData: InstagramSession = {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -9,10 +10,13 @@ import {
   Calendar,
   Download,
   ChevronDown,
-  Loader2
+  Loader2,
+  Instagram,
+  LogOut
 } from 'lucide-react';
 import { getInstagramAnalytics } from '@/lib/api/instagram';
 import { useNotifications } from '@/contexts/NotificationContext';
+import { useInstagramAuth } from '@/contexts/InstagramAuthContext';
 
 interface AnalyticsData {
   id: number;
@@ -31,12 +35,23 @@ interface AnalyticsData {
 type ViewType = 'daily' | 'weekly' | 'monthly';
 
 export default function SocmedAnalyticsPage() {
+  const router = useRouter();
+  const { session, isAuthenticated, logout, loading: authLoading } = useInstagramAuth();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState<ViewType>('daily');
   const { addNotification } = useNotifications();
 
+  // Redirect to Instagram login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/instagram-login?returnUrl=/socmed-analytics');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
   const loadAnalytics = React.useCallback(async () => {
+    if (!isAuthenticated) return;
+    
     try {
       setLoading(true);
       const response = await getInstagramAnalytics();
@@ -51,11 +66,30 @@ export default function SocmedAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [addNotification]);
+  }, [addNotification, isAuthenticated]);
 
   useEffect(() => {
     loadAnalytics();
   }, [loadAnalytics]);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/instagram-login');
+  };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // Calculate metrics based on view type
   const calculateMetrics = () => {
@@ -211,6 +245,23 @@ export default function SocmedAnalyticsPage() {
           <p className="text-gray-600">Track and analyze your Instagram performance</p>
         </div>
         <div className="flex items-center space-x-2">
+          {session && (
+            <div className="flex items-center space-x-3 mr-4">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">@{session.username}</p>
+                <p className="text-xs text-gray-500">{session.full_name || 'Instagram Account'}</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleLogout}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Disconnect
+              </Button>
+            </div>
+          )}
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Export

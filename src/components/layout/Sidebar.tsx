@@ -38,8 +38,8 @@ const navigation = [
     icon: BarChart3,
   },
   {
-    name: 'Socmed Uploader',
-    href: '/socmed-uploader',
+    name: 'Socmed Management',
+    href: '/socmed-management',
     icon: Upload,
   },
   {

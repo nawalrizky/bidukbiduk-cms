@@ -3,6 +3,7 @@ import "./globals.css";
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { NotificationProvider, NotificationContainer } from '@/contexts/NotificationContext'
+import { InstagramAuthProvider } from '@/contexts/InstagramAuthContext'
 
 export const metadata: Metadata = {
   title: "CMS Dashboard",
@@ -19,10 +20,12 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <NotificationProvider>
-            <AdminLayout>
-              {children}
-            </AdminLayout>
-            <NotificationContainer />
+            <InstagramAuthProvider>
+              <AdminLayout>
+                {children}
+              </AdminLayout>
+              <NotificationContainer />
+            </InstagramAuthProvider>
           </NotificationProvider>
         </AuthProvider>
       </body>

@@ -56,6 +56,31 @@ export interface CreateInstagramPost {
   session: number;
 }
 
+export interface InstagramPost {
+  id: number;
+  post_type: string;
+  caption: string;
+  media_url: string;
+  scheduled_at: string | null;
+  status: string;
+  extras: string | null;
+  session: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InstagramPostsResponse {
+  success: boolean;
+  message: string;
+  data: InstagramPost[];
+  pagination?: {
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+  };
+}
+
 export const getInstagramAnalytics = async (params?: {
   username?: string;
   month?: number;
@@ -91,4 +116,44 @@ export const createInstagramPost = async (data: CreateInstagramPost) => {
   });
   
   return response.data;
+};
+
+export const getInstagramPosts = async (): Promise<InstagramPostsResponse> => {
+  const response = await api.get('/instagram/posts/');
+  return response.data;
+};
+
+export const getInstagramPost = async (id: number): Promise<InstagramPost> => {
+  const response = await api.get(`/instagram/posts/${id}/`);
+  
+  // Handle nested response structure
+  if (response.data.success && response.data.data) {
+    return response.data.data;
+  }
+  
+  return response.data;
+};
+
+export const updateInstagramPost = async (id: number, data: Partial<CreateInstagramPost>) => {
+  const formData = new FormData();
+  
+  if (data.post_type) formData.append('post_type', data.post_type);
+  if (data.caption) formData.append('caption', data.caption);
+  if (data.media) formData.append('media', data.media);
+  if (data.status) formData.append('status', data.status);
+  if (data.session) formData.append('session', data.session.toString());
+  if (data.scheduled_at) formData.append('scheduled_at', data.scheduled_at);
+  if (data.extras) formData.append('extras', data.extras);
+
+  const response = await api.put(`/instagram/posts/${id}/`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  
+  return response.data;
+};
+
+export const deleteInstagramPost = async (id: number): Promise<void> => {
+  await api.delete(`/instagram/posts/${id}/`);
 };

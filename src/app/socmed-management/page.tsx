@@ -40,19 +40,20 @@ export default function SocmedManagementPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [posts, setPosts] = useState<InstagramPost[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingPost, setEditingPost] = useState<InstagramPost | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<InstagramPost | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [imageFallbacks, setImageFallbacks] = useState<{ [key: number]: string }>({});
   
   const [formData, setFormData] = useState({
     post_type: 'photo',
     caption: '',
     media: null as File | null,
     scheduled_at: '',
-    status: 'scheduled',
-    extras: '',
   });
 
   // Redirect to Instagram login if not authenticated
@@ -69,8 +70,10 @@ export default function SocmedManagementPage() {
       
       try {
         setLoading(true);
-        const response = await getInstagramPosts();
-        setPosts(response.data || []);
+        const response = await getInstagramPosts({ page: currentPage });
+        console.log('Loaded posts:', response.results);
+        setPosts(response.results || []);
+        setTotalCount(response.count);
       } catch (error) {
         console.error('Error loading posts:', error);
         addNotification({
@@ -84,15 +87,16 @@ export default function SocmedManagementPage() {
     };
 
     loadPostsData();
-  }, [isAuthenticated, addNotification]);
+  }, [isAuthenticated, currentPage, addNotification]);
 
   const loadPosts = async () => {
     if (!isAuthenticated) return;
     
     try {
       setLoading(true);
-      const response = await getInstagramPosts();
-      setPosts(response.data || []);
+      const response = await getInstagramPosts({ page: currentPage });
+      setPosts(response.results || []);
+      setTotalCount(response.count);
     } catch (error) {
       console.error('Error loading posts:', error);
       addNotification({
@@ -105,8 +109,8 @@ export default function SocmedManagementPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/instagram-login');
   };
 
@@ -133,8 +137,6 @@ export default function SocmedManagementPage() {
       caption: '',
       media: null,
       scheduled_at: '',
-      status: 'scheduled',
-      extras: '',
     });
     setMediaPreview(null);
     setEditingPost(null);
@@ -152,10 +154,28 @@ export default function SocmedManagementPage() {
       caption: post.caption,
       media: null,
       scheduled_at: post.scheduled_at || '',
-      status: post.status,
-      extras: post.extras || '',
     });
-    setMediaPreview(post.media_url);
+    
+    // Extract media URL from array or string
+    let mediaUrl = null;
+    if (Array.isArray(post.media) && post.media.length > 0) {
+      mediaUrl = post.media[0].url;
+    } else if (typeof post.media === 'string' && post.media.trim() !== '') {
+      mediaUrl = post.media;
+    }
+    
+    // Build full URL if it's a relative path
+    if (mediaUrl && !mediaUrl.startsWith('http')) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '') || 'https://backend.bidukbiduk.com';
+      // Encode the filename part to handle spaces and special characters
+      const urlParts = mediaUrl.split('/');
+      const filename = urlParts.pop();
+      const encodedFilename = encodeURIComponent(filename || '');
+      const path = urlParts.join('/');
+      mediaUrl = `${baseUrl}${path}/${encodedFilename}`;
+    }
+    
+    setMediaPreview(mediaUrl);
     setViewMode('edit');
   };
 
@@ -167,6 +187,16 @@ export default function SocmedManagementPage() {
         type: 'error',
         title: 'Not Authenticated',
         message: 'Please login to Instagram first',
+      });
+      return;
+    }
+
+    if (!session.id) {
+      console.error('Session exists but session.id is undefined:', session);
+      addNotification({
+        type: 'error',
+        title: 'Invalid Session',
+        message: 'Instagram session is invalid. Please reconnect.',
       });
       return;
     }
@@ -189,11 +219,11 @@ export default function SocmedManagementPage() {
       return;
     }
 
-    if (formData.status === 'scheduled' && !formData.scheduled_at) {
+    if (!formData.scheduled_at) {
       addNotification({
         type: 'error',
         title: 'Validation Error',
-        message: 'Scheduled date/time is required for scheduled posts',
+        message: 'Scheduled date and time is required',
       });
       return;
     }
@@ -207,9 +237,8 @@ export default function SocmedManagementPage() {
           post_type: formData.post_type,
           caption: formData.caption,
           media: formData.media || undefined,
-          scheduled_at: formData.scheduled_at || undefined,
-          status: formData.status,
-          extras: formData.extras || undefined,
+          scheduled_at: formData.scheduled_at,
+          status: 'scheduled',
           session: session.id,
         });
 
@@ -220,32 +249,67 @@ export default function SocmedManagementPage() {
         });
       } else {
         // Create new post
-        await createInstagramPost({
+        const postData = {
           post_type: formData.post_type,
           caption: formData.caption,
           media: formData.media!,
-          scheduled_at: formData.scheduled_at || undefined,
-          status: formData.status,
-          extras: formData.extras || undefined,
+          scheduled_at: formData.scheduled_at,
+          status: 'scheduled',
           session: session.id,
+        };
+        
+        console.log('Creating post with data:', {
+          ...postData,
+          media: postData.media ? `File: ${postData.media.name}` : 'No media',
+          session: postData.session,
         });
+
+        await createInstagramPost(postData);
 
         addNotification({
           type: 'success',
           title: 'Post Created',
-          message: `Instagram post has been ${formData.status === 'scheduled' ? 'scheduled' : 'created'} successfully`,
+          message: 'Instagram post has been scheduled successfully',
         });
       }
 
       resetForm();
       setViewMode('list');
       loadPosts();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving post:', error);
+      
+      const axiosError = error as { response?: { data?: unknown } };
+      console.error('Error response:', axiosError.response?.data);
+      
+      let errorMessage = 'An error occurred';
+      
+      if (axiosError.response?.data) {
+        const data = axiosError.response.data as Record<string, unknown>;
+        // Handle different error formats
+        if (typeof data === 'string') {
+          errorMessage = data;
+        } else if (data.detail) {
+          errorMessage = String(data.detail);
+        } else if (data.message) {
+          errorMessage = String(data.message);
+        } else if (data.error) {
+          errorMessage = String(data.error);
+        } else {
+          // If it's an object with field errors
+          const errors = Object.entries(data)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join('; ');
+          errorMessage = errors || JSON.stringify(data);
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       addNotification({
         type: 'error',
         title: 'Failed to save post',
-        message: error instanceof Error ? error.message : 'An error occurred',
+        message: errorMessage,
       });
     } finally {
       setSubmitting(false);
@@ -324,14 +388,21 @@ export default function SocmedManagementPage() {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Instagram Management</h1>
-            <p className="text-gray-600">Create, schedule, and manage your Instagram posts</p>
+            <p className="text-gray-600">
+              Create, schedule, and manage your Instagram posts
+              {totalCount > 0 && (
+                <span className="ml-2 text-sm font-medium text-blue-600">
+                  • {totalCount} total posts
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex items-center space-x-3">
             {session && (
               <div className="flex items-center space-x-3">
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">@{session.username}</p>
-                  <p className="text-xs text-gray-500">{session.full_name || 'Instagram Account'}</p>
+                  <p className="text-sm font-medium text-gray-900">@{session.instagram_username}</p>
+                  <p className="text-xs text-gray-500">{session.name || 'Instagram Account'}</p>
                 </div>
                 <Button
                   variant="outline"
@@ -371,21 +442,90 @@ export default function SocmedManagementPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post) => (
-              <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative h-64 bg-gray-100">
-                  <Image
-                    src={post.media_url}
-                    alt={post.caption}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 right-2">
-                    {getStatusBadge(post.status)}
+            {posts.map((post) => {
+              // Extract media URL from array
+              const mediaUrl = Array.isArray(post.media) && post.media.length > 0 
+                ? post.media[0].url 
+                : typeof post.media === 'string' 
+                ? post.media 
+                : null;
+              
+              // Build full URL if it's a relative path
+              const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '') || 'https://backend.bidukbiduk.com';
+              let fullMediaUrl = null;
+              if (mediaUrl && !mediaUrl.startsWith('http')) {
+                // Encode the filename part of the URL to handle spaces and special characters
+                const urlParts = mediaUrl.split('/');
+                const filename = urlParts.pop();
+                const encodedFilename = encodeURIComponent(filename || '');
+                const path = urlParts.join('/');
+                fullMediaUrl = `${baseUrl}${path}/${encodedFilename}`;
+              } else {
+                fullMediaUrl = mediaUrl;
+              }
+
+              // Fallback to Instagram thumbnail if available
+              const candidates = (typeof post.extras === 'object' && 
+                post.extras?.last_response?.data?.image_versions2?.candidates);
+              const thumbnailUrl = (typeof post.extras === 'object' && 
+                post.extras?.last_response?.data?.thumbnail_url);
+              const instagramThumbnail = thumbnailUrl || 
+                ((candidates && Array.isArray(candidates) && candidates.length > 0) ? candidates[0].url : null);
+
+              // Use Instagram thumbnail as primary, fallback to our media
+              const imageUrl = instagramThumbnail || fullMediaUrl;
+
+              // Debug logging
+              console.log('Post media debug:', {
+                postId: post.id,
+                status: post.status,
+                mediaRaw: post.media,
+                mediaUrl,
+                baseUrl,
+                fullMediaUrl,
+                fullMediaUrlEncoded: fullMediaUrl,
+                thumbnailUrl,
+                candidatesLength: candidates ? (Array.isArray(candidates) ? candidates.length : 'not array') : 'no candidates',
+                instagramThumbnail,
+                finalImageUrl: imageUrl,
+                hasExtras: !!post.extras,
+                hasInstagramResponse: typeof post.extras === 'object' && !!post.extras?.last_response,
+                hasSpaceInUrl: mediaUrl ? mediaUrl.includes(' ') : false
+              });
+
+              return (
+                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="relative h-64 bg-gray-100">
+                    {imageUrl && !imageFallbacks[post.id] ? (
+                      <Image
+                        src={imageUrl}
+                        alt={post.caption || 'Instagram post'}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                        onError={(e) => {
+                          console.error('Image load error for post', post.id, ':', e);
+                          console.log('Failed URL:', imageUrl);
+                          
+                          // Mark this image as failed and show placeholder
+                          setImageFallbacks(prev => ({ ...prev, [post.id]: 'failed' }));
+                        }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full flex-col">
+                        <ImageIcon className="h-16 w-16 text-gray-400 mb-2" />
+                        <p className="text-xs text-gray-500">Image not available</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {post.status === 'scheduled' ? 'Scheduled post' : 'Posted'}
+                        </p>
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2">
+                      {getStatusBadge(post.status)}
+                    </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <p className="text-sm text-gray-700 line-clamp-3 mb-3">
+                  <div className="p-4">
+                    <p className="text-sm text-gray-700 line-clamp-3 mb-3">
                     {post.caption}
                   </p>
                   {post.scheduled_at && (
@@ -415,7 +555,33 @@ export default function SocmedManagementPage() {
                   </div>
                 </div>
               </Card>
-            ))}
+            );
+            })}
+          </div>
+        )}
+
+        {/* Pagination - Simple version for now */}
+        {totalCount > 0 && (
+          <div className="flex items-center justify-center space-x-4 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={posts.length === 0}
+            >
+              Next
+            </Button>
           </div>
         )}
 
@@ -478,23 +644,6 @@ export default function SocmedManagementPage() {
             </div>
 
             <div>
-              <Label htmlFor="status">Status</Label>
-              <select
-                id="status"
-                value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value)}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={submitting}
-              >
-                <option value="draft">Draft</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
-          </div>
-
-          {formData.status === 'scheduled' && (
-            <div>
               <Label htmlFor="scheduled_at">Scheduled Date & Time</Label>
               <Input
                 id="scheduled_at"
@@ -502,10 +651,11 @@ export default function SocmedManagementPage() {
                 value={formData.scheduled_at}
                 onChange={(e) => handleInputChange('scheduled_at', e.target.value)}
                 disabled={submitting}
-                required={formData.status === 'scheduled'}
+                required
+                className="mt-1"
               />
             </div>
-          )}
+          </div>
 
           <div>
             <Label htmlFor="caption">Caption</Label>
@@ -531,6 +681,13 @@ export default function SocmedManagementPage() {
                       alt="Preview"
                       fill
                       className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        console.error('Preview image load error:', {
+                          src: mediaPreview,
+                          error: e
+                        });
+                      }}
                     />
                   </div>
                   <Button
@@ -569,18 +726,6 @@ export default function SocmedManagementPage() {
                 </div>
               )}
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="extras">Additional Notes (Optional)</Label>
-            <Textarea
-              id="extras"
-              value={formData.extras}
-              onChange={(e) => handleInputChange('extras', e.target.value)}
-              placeholder="Add any additional notes or metadata..."
-              rows={3}
-              disabled={submitting}
-            />
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t">

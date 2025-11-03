@@ -198,11 +198,7 @@ export default function GalleryPage() {
                   </div>
                   <div className="p-3">
                     <h3 className="font-medium text-sm truncate group-hover:text-blue-600 transition-colors">{item.title}</h3>
-                    {item.category_name && (
-                      <p className="text-xs text-gray-500 truncate">
-                        {item.category_name}
-                      </p>
-                    )}
+                   
                   </div>
                 </Link>
                 <div className="px-3 pb-3">

@@ -115,7 +115,14 @@ export const getPackage = async (packageId: number): Promise<Package> => {
   
   console.log('getPackage API response:', response.data);
   
-  // Handle nested response structure
+  // Handle nested response structure with results.data.items[0]
+  if (response.data.results?.data?.items && Array.isArray(response.data.results.data.items)) {
+    const packageData = response.data.results.data.items[0];
+    console.log('Extracted package from results.data.items[0]:', packageData);
+    return packageData;
+  }
+  
+  // Handle nested response structure with data
   if (response.data.data) {
     return response.data.data;
   }

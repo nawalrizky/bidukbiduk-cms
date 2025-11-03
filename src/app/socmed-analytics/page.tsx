@@ -11,7 +11,6 @@ import {
   Download,
   ChevronDown,
   Loader2,
-  Instagram,
   LogOut
 } from 'lucide-react';
 import { getInstagramAnalytics } from '@/lib/api/instagram';
@@ -38,8 +37,15 @@ export default function SocmedAnalyticsPage() {
   const router = useRouter();
   const { session, isAuthenticated, logout, loading: authLoading } = useInstagramAuth();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState<ViewType>('daily');
+  const [filters, setFilters] = useState({
+    month: undefined as number | undefined,
+    year: undefined as number | undefined,
+    start_date: undefined as string | undefined,
+    end_date: undefined as string | undefined,
+  });
   const { addNotification } = useNotifications();
 
   // Redirect to Instagram login if not authenticated
@@ -54,8 +60,10 @@ export default function SocmedAnalyticsPage() {
     
     try {
       setLoading(true);
-      const response = await getInstagramAnalytics();
+      const response = await getInstagramAnalytics(filters);
       setAnalyticsData(response.data);
+      setTotalCount(response.count);
+      console.log(`Loaded ${response.data.length} of ${response.count} total analytics records`);
     } catch (error) {
       console.error('Error loading analytics:', error);
       addNotification({
@@ -66,14 +74,14 @@ export default function SocmedAnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  }, [addNotification, isAuthenticated]);
+  }, [addNotification, isAuthenticated, filters]);
 
   useEffect(() => {
     loadAnalytics();
   }, [loadAnalytics]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/instagram-login');
   };
 
@@ -242,14 +250,21 @@ export default function SocmedAnalyticsPage() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Social Media Analytics</h1>
-          <p className="text-gray-600">Track and analyze your Instagram performance</p>
+          <p className="text-gray-600">
+            Track and analyze your Instagram performance
+            {totalCount > 0 && (
+              <span className="ml-2 text-sm font-medium text-blue-600">
+                • {totalCount} total snapshots
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex items-center space-x-2">
           {session && (
             <div className="flex items-center space-x-3 mr-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">@{session.username}</p>
-                <p className="text-xs text-gray-500">{session.full_name || 'Instagram Account'}</p>
+                <p className="text-sm font-medium text-gray-900">@{session.instagram_username}</p>
+                <p className="text-xs text-gray-500">{session.name || 'Instagram Account'}</p>
               </div>
               <Button 
                 variant="outline" 
@@ -311,6 +326,75 @@ export default function SocmedAnalyticsPage() {
           </button>
         </div>
       </div>
+
+      {/* Date Range Filter */}
+      <Card className="p-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <Calendar className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Filter by Date:</span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-600">From:</label>
+            <input
+              type="date"
+              value={filters.start_date || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, start_date: e.target.value || undefined }))}
+              className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-600">To:</label>
+            <input
+              type="date"
+              value={filters.end_date || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, end_date: e.target.value || undefined }))}
+              className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-600">Month:</label>
+            <select
+              value={filters.month || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, month: e.target.value ? parseInt(e.target.value) : undefined }))}
+              className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Months</option>
+              {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                <option key={m} value={m}>{new Date(2000, m-1).toLocaleString('default', { month: 'long' })}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-600">Year:</label>
+            <select
+              value={filters.year || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value ? parseInt(e.target.value) : undefined }))}
+              className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Years</option>
+              {[2025, 2024, 2023].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+
+          {(filters.start_date || filters.end_date || filters.month || filters.year) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilters({ month: undefined, year: undefined, start_date: undefined, end_date: undefined })}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              Clear Filters
+            </Button>
+          )}
+        </div>
+      </Card>
 
       {/* Audience Section */}
       <div>

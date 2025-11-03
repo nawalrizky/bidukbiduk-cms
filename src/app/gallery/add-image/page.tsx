@@ -35,11 +35,11 @@ export default function AddImagePage() {
   const [formData, setFormData] = useState<CreateGalleryItem>({
     title: '',
     description: '',
-    category: 1, // Default category
+    category: 1, // Default category - hidden from UI
     file: '',
     tags: '',
     is_featured: true, // Default to featured
-  })
+  });
 
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -99,11 +99,11 @@ export default function AddImagePage() {
         setFormData({
           title: '',
           description: '',
-          category: 2,
+          category: 1, // Keep default category
           file: '',
           tags: '',
           is_featured: true,
-        })
+        });
         setPreviewUrl('')
         setSelectedFile(null)
         
@@ -116,7 +116,16 @@ export default function AddImagePage() {
       }
     } catch (err) {
       console.error('Error uploading image:', err)
-      setError('Failed to upload image. Please try again.')
+      
+      // Extract detailed error message
+      let errorMessage = 'Failed to upload image. ';
+      if (err instanceof Error) {
+        errorMessage += err.message;
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

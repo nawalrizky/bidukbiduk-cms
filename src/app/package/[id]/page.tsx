@@ -200,21 +200,26 @@ export default function PackageDetailPage({
           </Card>
 
           {/* Destinations */}
-          {packageData.destinations && packageData.destinations.length > 0 && (
+          {packageData.destination_details && packageData.destination_details.length > 0 && (
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">
                 <MapPin className="inline h-5 w-5 mr-2" />
-                Destinations Included
+                Destinations Included ({packageData.destination_details.length})
               </h2>
               <div className="space-y-4">
-                {packageData.destinations.map((dest, index) => (
+                {packageData.destination_details.map((dest, index) => (
                   <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
                     <h3 className="font-semibold text-lg">{dest.name}</h3>
                     {dest.location && (
-                      <p className="text-sm text-gray-600">{dest.location}</p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        <MapPin className="inline h-3 w-3 mr-1" />
+                        {dest.location}
+                      </p>
                     )}
                     {dest.description && (
-                      <p className="text-sm text-gray-700 mt-1">{dest.description}</p>
+                      <p className="text-sm text-gray-700 line-clamp-3">
+                        {dest.description}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -311,15 +316,6 @@ export default function PackageDetailPage({
                   </div>
                 </div>
               )}
-              <div className="flex items-start">
-                <MapPin className="h-4 w-4 mr-2 mt-0.5 text-gray-400" />
-                <div>
-                  <p className="text-gray-500">Total Destinations</p>
-                  <p className="font-medium">
-                    {packageData.destinations?.length || 0} destination{packageData.destinations?.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
             </div>
           </Card>
         </div>

@@ -182,6 +182,7 @@ export interface Package {
   total_rating: number;
   total_rating_users: number;
   destinations?: PackageDestination[];
+  destination_details?: PackageDestination[]; // Alternative field name from API
   created_at?: string;
   updated_at?: string;
 }

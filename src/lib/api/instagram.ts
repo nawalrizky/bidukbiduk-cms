@@ -56,29 +56,47 @@ export interface CreateInstagramPost {
   session: number;
 }
 
+export interface InstagramMediaItem {
+  url: string;
+  type: string;
+}
+
+export interface InstagramExtras {
+  last_response?: {
+    time: string;
+    data: {
+      thumbnail_url?: string;
+      image_versions2?: {
+        candidates: Array<{
+          url: string;
+          width: number;
+          height: number;
+        }>;
+      };
+      [key: string]: unknown;
+    };
+  };
+  [key: string]: unknown;
+}
+
 export interface InstagramPost {
   id: number;
   post_type: string;
   caption: string;
-  media_url: string;
+  media: InstagramMediaItem[] | string; // Can be array or string
   scheduled_at: string | null;
   status: string;
-  extras: string | null;
+  extras: InstagramExtras | string | null;
   session: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface InstagramPostsResponse {
-  success: boolean;
-  message: string;
-  data: InstagramPost[];
-  pagination?: {
-    total: number;
-    page: number;
-    page_size: number;
-    total_pages: number;
-  };
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: InstagramPost[];
 }
 
 export const getInstagramAnalytics = async (params?: {
@@ -94,6 +112,10 @@ export const getInstagramAnalytics = async (params?: {
 };
 
 export const createInstagramPost = async (data: CreateInstagramPost) => {
+  if (!data.session) {
+    throw new Error('Instagram session ID is required');
+  }
+
   const formData = new FormData();
   formData.append('post_type', data.post_type);
   formData.append('caption', data.caption);
@@ -118,19 +140,16 @@ export const createInstagramPost = async (data: CreateInstagramPost) => {
   return response.data;
 };
 
-export const getInstagramPosts = async (): Promise<InstagramPostsResponse> => {
-  const response = await api.get('/instagram/posts/');
+export const getInstagramPosts = async (params?: {
+  page?: number;
+  page_size?: number;
+}): Promise<InstagramPostsResponse> => {
+  const response = await api.get('/instagram/posts/', { params });
   return response.data;
 };
 
 export const getInstagramPost = async (id: number): Promise<InstagramPost> => {
   const response = await api.get(`/instagram/posts/${id}/`);
-  
-  // Handle nested response structure
-  if (response.data.success && response.data.data) {
-    return response.data.data;
-  }
-  
   return response.data;
 };
 
@@ -141,11 +160,11 @@ export const updateInstagramPost = async (id: number, data: Partial<CreateInstag
   if (data.caption) formData.append('caption', data.caption);
   if (data.media) formData.append('media', data.media);
   if (data.status) formData.append('status', data.status);
-  if (data.session) formData.append('session', data.session.toString());
+  if (data.session !== undefined) formData.append('session', data.session.toString());
   if (data.scheduled_at) formData.append('scheduled_at', data.scheduled_at);
   if (data.extras) formData.append('extras', data.extras);
 
-  const response = await api.put(`/instagram/posts/${id}/`, formData, {
+  const response = await api.patch(`/instagram/posts/${id}/`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -157,3 +176,28 @@ export const updateInstagramPost = async (id: number, data: Partial<CreateInstag
 export const deleteInstagramPost = async (id: number): Promise<void> => {
   await api.delete(`/instagram/posts/${id}/`);
 };
+
+// Instagram Session Management
+export const getInstagramSession = async (): Promise<InstagramSession> => {
+  const response = await api.get('/instagram/session/');
+  return response.data;
+};
+
+export const deleteInstagramSession = async (): Promise<void> => {
+  await api.delete('/instagram/session/');
+};
+
+interface InstagramSession {
+  id: number;
+  name: string;
+  instagram_username: string;
+  session: {
+    authorization_data: {
+      ds_user_id: string;
+      sessionid: string;
+    };
+    [key: string]: unknown;
+  };
+  created_at: string;
+  updated_at: string;
+}

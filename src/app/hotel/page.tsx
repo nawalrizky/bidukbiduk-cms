@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal'
-import { Plus, Search, Filter, Star, Edit, Trash2, Loader2, Building } from 'lucide-react'
+import { Plus, Search, Star, Edit, Trash2, Loader2, Building } from 'lucide-react'
 import { getHotels, deleteHotel } from '@/lib/api/hotels'
 import { Hotel } from '@/lib/types'
 import { useNotifications } from '@/contexts/NotificationContext'
@@ -16,7 +16,6 @@ export default function HotelPage() {
   const [hotels, setHotels] = useState<Hotel[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [showActiveOnly, setShowActiveOnly] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null)
   
   // Use the global delete modal hook
@@ -75,8 +74,8 @@ export default function HotelPage() {
       
       addNotification({
         type: 'success',
-        title: 'Hotel deleted',
-        message: `Hotel "${deleteModal.itemToDelete.name}" has been deleted successfully`
+        title: 'Hotel deactivated',
+        message: `Hotel "${deleteModal.itemToDelete.name}" has been deactivated successfully`
       })
       
       // Close modal and reload hotels list
@@ -87,7 +86,7 @@ export default function HotelPage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
       addNotification({
         type: 'error',
-        title: 'Failed to delete hotel',
+        title: 'Failed to deactivate hotel',
         message: errorMessage
       })
     } finally {
@@ -96,13 +95,13 @@ export default function HotelPage() {
     }
   }
 
-  // Filter hotels based on search term and active status
+  // Filter hotels based on search term and only show active hotels
   const filteredHotels = hotels.filter(hotel => {
     if (!Array.isArray(hotels)) return false
     
     const matchesSearch = hotel.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false
-    const matchesActiveFilter = showActiveOnly ? hotel.is_active : true
-    return matchesSearch && matchesActiveFilter
+    const isActive = hotel.is_active === true
+    return matchesSearch && isActive
   })
 
   if (loading) {
@@ -165,14 +164,14 @@ export default function HotelPage() {
           <div className="flex flex-col items-center justify-center py-12">
             <Building className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm || showActiveOnly ? 'No hotels found' : 'No hotels yet'}
+              {searchTerm ? 'No hotels found' : 'No hotels yet'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchTerm || showActiveOnly 
-                ? 'Try adjusting your search or filter criteria.' 
+              {searchTerm 
+                ? 'Try adjusting your search criteria.' 
                 : 'Get started by creating your first hotel listing.'}
             </p>
-            {!searchTerm && !showActiveOnly && (
+            {!searchTerm && (
               <Link href="/hotel/add-hotel">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
@@ -299,6 +298,8 @@ export default function HotelPage() {
         onConfirm={confirmDelete}
         itemName={deleteModal.itemToDelete?.name || ''}
         itemType="Hotel"
+        title="Deactivate Hotel"
+        customMessage={`Are you sure you want to deactivate "${deleteModal.itemToDelete?.name}"? The hotel will be hidden from the listing but can be reactivated later.`}
         isDeleting={deleteLoading !== null}
       />
     </div>

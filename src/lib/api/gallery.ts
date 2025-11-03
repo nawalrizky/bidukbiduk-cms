@@ -137,8 +137,39 @@ export const createGalleryItem = async (item: CreateGalleryItem): Promise<Galler
     if (error && typeof error === 'object' && 'response' in error) {
       const axiosError = error as AxiosError;
       console.error('Axios error response:', axiosError.response?.data);
+      console.error('Response data type:', typeof axiosError.response?.data);
+      console.error('Response data stringified:', JSON.stringify(axiosError.response?.data, null, 2));
       console.error('Status:', axiosError.response?.status);
       console.error('Headers:', axiosError.response?.headers);
+      
+      // Show user-friendly error message
+      const errorData = axiosError.response?.data as Record<string, unknown>;
+      if (errorData) {
+        console.error('Backend error details:', errorData);
+        
+        // Try to extract meaningful error message
+        let errorMessage = 'Failed to create gallery item. ';
+        if (typeof errorData === 'string') {
+          errorMessage += errorData;
+        } else if (errorData.error) {
+          errorMessage += errorData.error;
+        } else if (errorData.message) {
+          errorMessage += errorData.message;
+        } else if (errorData.detail) {
+          errorMessage += errorData.detail;
+        } else {
+          // Show field-specific errors
+          const fieldErrors = Object.entries(errorData)
+            .filter(([key]) => key !== 'success')
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('; ');
+          if (fieldErrors) {
+            errorMessage += fieldErrors;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
     }
     
     throw error;

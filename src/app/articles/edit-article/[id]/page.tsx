@@ -29,7 +29,7 @@ export default function EditArticlePage() {
     featured_image: null as File | null,
     category: 0,
     tags: '',
-    status: 'draft' as 'draft' | 'published' | 'archived',
+    status: 'published' as 'draft' | 'published' | 'archived',
     publish_date: ''
   })
 
@@ -53,7 +53,7 @@ export default function EditArticlePage() {
           featured_image: null,
           category: articleData.category,
           tags: articleData.tags || '',
-          status: articleData.status,
+          status: 'published', // Always default to published
           publish_date: articleData.publish_date 
             ? new Date(articleData.publish_date).toISOString().slice(0, 16)
             : ''
@@ -302,11 +302,12 @@ export default function EditArticlePage() {
                 value={formData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 rows={15}
-                className="resize-none font-mono"
+                className="resize-none whitespace-pre-wrap"
+                style={{ fontFamily: 'inherit' }}
                 required
               />
               <p className="text-sm text-gray-500">
-                You can use HTML tags for formatting. {formData.content.length} characters
+                Formatting preserved (spaces, enters, etc.). {formData.content.length} characters
               </p>
             </div>
 
@@ -322,21 +323,6 @@ export default function EditArticlePage() {
               <p className="text-sm text-gray-500">
                 Separate multiple tags with commas
               </p>
-            </div>
-
-            {/* Status */}
-            <div className="space-y-2">
-              <Label htmlFor="status">Status *</Label>
-              <select
-                id="status"
-                value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value)}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
             </div>
 
             {/* Publish Date */}

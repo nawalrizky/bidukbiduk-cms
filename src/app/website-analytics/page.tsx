@@ -44,7 +44,7 @@ export default function WebsiteAnalyticsPage() {
         <CardContent className="p-0">
           <div className="w-full h-[600px] relative">
             <iframe
-              src="https://umami-sigma-ashen.vercel.app/share/TAquwr3D0uOM0kWh/umami-test-chi.vercel.app"
+              src="https://umami-sigma-ashen.vercel.app/share/TAquwr3D0uOM0kWh/bidukbiduk.com"
               className="w-full h-full border-0 rounded-b-lg"
               title="Umami Analytics Dashboard"
               loading="lazy"

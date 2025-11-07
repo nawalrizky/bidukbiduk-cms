@@ -454,44 +454,16 @@ export default function SocmedManagementPage() {
               const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '') || 'https://backend.bidukbiduk.com';
               let fullMediaUrl = null;
               if (mediaUrl && !mediaUrl.startsWith('http')) {
-                // Encode the filename part of the URL to handle spaces and special characters
-                const urlParts = mediaUrl.split('/');
-                const filename = urlParts.pop();
-                const encodedFilename = encodeURIComponent(filename || '');
-                const path = urlParts.join('/');
-                fullMediaUrl = `${baseUrl}${path}/${encodedFilename}`;
+                // Simply concatenate base URL with media path
+                // Backend already sanitizes filenames (removes spaces, etc.)
+                fullMediaUrl = `${baseUrl}${mediaUrl}`;
               } else {
                 fullMediaUrl = mediaUrl;
               }
 
-              // Fallback to Instagram thumbnail if available
-              const candidates = (typeof post.extras === 'object' && 
-                post.extras?.last_response?.data?.image_versions2?.candidates);
-              const thumbnailUrl = (typeof post.extras === 'object' && 
-                post.extras?.last_response?.data?.thumbnail_url);
-              const instagramThumbnail = thumbnailUrl || 
-                ((candidates && Array.isArray(candidates) && candidates.length > 0) ? candidates[0].url : null);
-
-              // Use Instagram thumbnail as primary, fallback to our media
-              const imageUrl = instagramThumbnail || fullMediaUrl;
-
-              // Debug logging
-              console.log('Post media debug:', {
-                postId: post.id,
-                status: post.status,
-                mediaRaw: post.media,
-                mediaUrl,
-                baseUrl,
-                fullMediaUrl,
-                fullMediaUrlEncoded: fullMediaUrl,
-                thumbnailUrl,
-                candidatesLength: candidates ? (Array.isArray(candidates) ? candidates.length : 'not array') : 'no candidates',
-                instagramThumbnail,
-                finalImageUrl: imageUrl,
-                hasExtras: !!post.extras,
-                hasInstagramResponse: typeof post.extras === 'object' && !!post.extras?.last_response,
-                hasSpaceInUrl: mediaUrl ? mediaUrl.includes(' ') : false
-              });
+              // Use our media URL as primary source
+              // Only fallback to Instagram thumbnail if our media is not available
+              const imageUrl = fullMediaUrl;
 
               return (
                 <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -503,10 +475,7 @@ export default function SocmedManagementPage() {
                         fill
                         className="object-cover"
                         unoptimized
-                        onError={(e) => {
-                          console.error('Image load error for post', post.id, ':', e);
-                          console.log('Failed URL:', imageUrl);
-                          
+                        onError={() => {
                           // Mark this image as failed and show placeholder
                           setImageFallbacks(prev => ({ ...prev, [post.id]: 'failed' }));
                         }}

@@ -109,7 +109,7 @@ export default function ArticleDetailPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading article...</p>
+          <p className="text-gray-600">Memuat artikel...</p>
         </div>
       </div>
     )
@@ -119,11 +119,11 @@ export default function ArticleDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
         <FileText className="h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Article not found</h3>
-        <p className="text-gray-600 mb-4">The article you&apos;re looking for doesn&apos;t exist.</p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Artikel tidak ditemukan</h3>
+        <p className="text-gray-600 mb-4">Artikel yang Anda cari tidak ditemukan.</p>
         <Button onClick={() => router.push('/articles')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Articles
+          Kembali ke Artikel
         </Button>
       </div>
     )
@@ -135,7 +135,7 @@ export default function ArticleDetailPage() {
       <div className="flex justify-between items-center">
         <Button variant="outline" onClick={() => router.push('/articles')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Articles
+          Kembali ke Artikel
         </Button>
         <div className="flex space-x-2">
           <Button
@@ -143,7 +143,7 @@ export default function ArticleDetailPage() {
             onClick={() => router.push(`/articles/edit-article/${article.id}`)}
           >
             <Edit className="h-4 w-4 mr-2" />
-            Edit
+            Sunting
           </Button>
           <Button
             variant="outline"
@@ -151,7 +151,7 @@ export default function ArticleDetailPage() {
             className="text-red-500 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            Hapus
           </Button>
         </div>
       </div>
@@ -208,7 +208,7 @@ export default function ArticleDetailPage() {
         {/* Tags */}
         {article.tags_list && article.tags_list.length > 0 && (
           <div className="pt-6 border-t">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags:</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Tag:</h3>
             <div className="flex flex-wrap gap-2">
               {article.tags_list.map((tag, index) => (
                 <span 
@@ -225,8 +225,8 @@ export default function ArticleDetailPage() {
         {/* Footer Meta */}
         <div className="mt-8 pt-6 border-t text-sm text-gray-500">
           <div className="flex justify-between">
-            <span>Created: {formatDate(article.created_at)}</span>
-            <span>Last updated: {formatDate(article.updated_at)}</span>
+            <span>Dibuat: {formatDate(article.created_at)}</span>
+            <span>Terakhir diperbarui: {formatDate(article.updated_at)}</span>
           </div>
         </div>
       </Card>
@@ -237,7 +237,8 @@ export default function ArticleDetailPage() {
         onClose={deleteModal.closeModal}
         onConfirm={confirmDelete}
         itemName={article.title}
-        itemType="Article"
+        title="Hapus Artikel"
+        customMessage={`Apakah Anda yakin ingin menghapus "${article.title}"? Tindakan ini tidak dapat dibatalkan.`}
         isDeleting={deleteLoading}
       />
     </div>

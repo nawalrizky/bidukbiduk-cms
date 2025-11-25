@@ -29,6 +29,7 @@ export default function AddHotelPage() {
   const [loading, setLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -48,9 +49,7 @@ export default function AddHotelPage() {
     }));
   };
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    
+  const processImageFiles = (files: File[]) => {
     if (files.length === 0) return;
 
     // Validate file types
@@ -93,6 +92,37 @@ export default function AddHotelPage() {
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    processImageFiles(files);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const files = Array.from(e.dataTransfer.files || []);
+    processImageFiles(files);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -366,13 +396,25 @@ export default function AddHotelPage() {
             )}
 
             {/* Upload Area */}
-            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+            <div 
+              className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                isDragging 
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-300 hover:border-gray-400'
+              }`}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
               <p className="text-sm text-gray-600 mb-2">
-                {imagePreviews.length > 0 ? "Add more images" : "Click to upload or drag and drop"}
+                {isDragging 
+                  ? 'Drop gambar di sini'
+                  : (imagePreviews.length > 0 ? "Tambah lebih banyak gambar" : "Klik untuk upload atau drag and drop")}
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, GIF up to 5MB each. Select multiple files.
+                PNG, JPG, GIF hingga 5MB per gambar. Pilih beberapa file.
               </p>
               <input
                 type="file"

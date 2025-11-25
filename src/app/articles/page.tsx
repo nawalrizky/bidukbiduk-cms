@@ -119,8 +119,8 @@ export default function ArticlesPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">News & Articles</h1>
-            <p className="text-gray-600">Manage news articles and blog posts</p>
+            <h1 className="text-3xl font-bold tracking-tight">Berita & Artikel</h1>
+            <p className="text-gray-600">Kelola berita dan postingan blog</p>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -147,11 +147,11 @@ export default function ArticlesPage() {
             onClick={() => router.push('/articles/categories')}
           >
             <Tag className="mr-2 h-4 w-4" />
-            Manage Categories
+            Kelola Kategori
           </Button>
           <Button onClick={() => router.push('/articles/add-article')}>
             <Plus className="mr-2 h-4 w-4" />
-            Add New Article
+            Tambah Artikel Baru
           </Button>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function ArticlesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search articles..."
+                placeholder="Cari artikel..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -171,15 +171,15 @@ export default function ArticlesPage() {
             </div>
           </div>
           <div className="w-full sm:w-48">
-            <select
+              <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              <option value="">All Status</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-              <option value="archived">Archived</option>
+              <option value="">Semua Status</option>
+              <option value="published">Diterbitkan</option>
+              <option value="draft">Draf</option>
+              <option value="archived">Arsip</option>
             </select>
           </div>
         </div>
@@ -191,17 +191,17 @@ export default function ArticlesPage() {
           <div className="flex flex-col items-center justify-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm || statusFilter ? 'No articles found' : 'No articles yet'}
+              {searchTerm || statusFilter ? 'Artikel tidak ditemukan' : 'Belum ada artikel'}
             </h3>
             <p className="text-gray-600 mb-4">
               {searchTerm || statusFilter
-                ? 'Try adjusting your search or filter criteria.' 
-                : 'Get started by creating your first article.'}
+                ? 'Coba ubah kriteria pencarian atau filter.' 
+                : 'Mulai dengan membuat artikel pertama Anda.'}
             </p>
             {!searchTerm && !statusFilter && (
               <Button onClick={() => router.push('/articles/add-article')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create First Article
+                Buat Artikel Pertama
               </Button>
             )}
           </div>

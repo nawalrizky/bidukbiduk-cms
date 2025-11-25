@@ -137,14 +137,14 @@ export default function PackagePage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Packages</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Paket</h1>
           <p className="text-gray-600">
-            Manage travel packages and tour offerings
+            Kelola paket perjalanan dan penawaran tur
           </p>
         </div>
         <Button onClick={() => router.push('/package/add-package')}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Package
+          Tambah Paket
         </Button>
       </div>
 
@@ -153,7 +153,7 @@ export default function PackagePage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search packages or destinations..."
+            placeholder="Cari paket atau destinasi..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -168,12 +168,12 @@ export default function PackagePage() {
           <div className="flex flex-col items-center justify-center py-16">
             <PackageIcon className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {safePackages.length === 0 ? 'No packages yet' : 'No packages found'}
+              {safePackages.length === 0 ? 'Belum ada paket' : 'Tidak ada paket ditemukan'}
             </h3>
             <p className="text-gray-600 text-center max-w-md">
               {safePackages.length === 0 
-                ? 'Get started by creating your first travel package.'
-                : 'Try adjusting your search or filter criteria.'
+                ? 'Mulai dengan membuat paket perjalanan pertama Anda.'
+                : 'Coba ubah kriteria pencarian atau filter.'
               }
             </p>
             {safePackages.length === 0 && (
@@ -182,7 +182,7 @@ export default function PackagePage() {
                 onClick={() => router.push('/package/add-package')}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Package
+                Tambah Paket
               </Button>
             )}
           </div>
@@ -215,7 +215,7 @@ export default function PackagePage() {
                       ? "bg-green-100 text-green-800" 
                       : "bg-gray-100 text-gray-800"
                   }`}>
-                    {pkg.is_active ? "Active" : "Inactive"}
+                    {pkg.is_active ? "Aktif" : "Nonaktif"}
                   </span>
                 </div>
               </div>

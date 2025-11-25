@@ -43,9 +43,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="text-black hover:bg-blue-50">
-            <Bell className="h-5 w-5" />
-          </Button>
+          
           
           <div className="relative">
             <Button 
@@ -74,7 +72,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Settings
+                    Pengaturan
                   </button>
                   <button
                     onClick={() => {
@@ -84,7 +82,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                     className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
+                    Keluar
                   </button>
                 </div>
               </div>

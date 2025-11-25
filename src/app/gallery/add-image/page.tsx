@@ -43,11 +43,14 @@ export default function AddImagePage() {
 
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
-  // Handle file input change
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  // Handle file selection (shared by both click and drag & drop)
+  const handleFileSelect = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file')
+      return
+    }
     
     // Store the actual file object
     setSelectedFile(file)
@@ -58,6 +61,43 @@ export default function AddImagePage() {
     
     // Store the File object directly in form data
     setFormData(prev => ({ ...prev, file }))
+  }
+
+  // Handle file input change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileSelect(file)
+    }
+  }
+
+  // Handle drag & drop events
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      handleFileSelect(file)
+    }
   }
 
   // Handle form submission
@@ -217,10 +257,20 @@ export default function AddImagePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="file">Image File</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <div 
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    isDragging 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  onDragEnter={handleDragEnter}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
                   <p className="text-sm text-gray-600 mb-2">
-                    Drag and drop an image, or click to browse
+                    {isDragging ? 'Drop gambar di sini' : 'Drag and drop gambar, atau klik untuk memilih'}
                   </p>
                   <Input
                     type="file"
@@ -228,6 +278,17 @@ export default function AddImagePage() {
                     className="mt-2"
                     onChange={handleFileChange}
                   />
+                  {previewUrl && (
+                    <div className="mt-4">
+                      <Image
+                        src={previewUrl}
+                        alt="Preview"
+                        width={200}
+                        height={200}
+                        className="mx-auto rounded-lg object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

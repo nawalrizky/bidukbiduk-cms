@@ -19,6 +19,7 @@ export default function AddArticlePage() {
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<ArticleCategory[]>([])
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -56,16 +57,57 @@ export default function AddArticlePage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleFileSelect = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      addNotification({
+        type: 'error',
+        title: 'Invalid File',
+        message: 'Please select an image file'
+      })
+      return
+    }
+
+    setFormData(prev => ({ ...prev, featured_image: file }))
+    
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setFormData(prev => ({ ...prev, featured_image: file }))
-      
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+      handleFileSelect(file)
+    }
+  }
+
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      handleFileSelect(file)
     }
   }
 
@@ -205,26 +247,54 @@ export default function AddArticlePage() {
                       className="object-cover"
                     />
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 bg-white"
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    Remove
-                  </Button>
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <label htmlFor="featured_image">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="bg-white cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById('featured_image')?.click();
+                        }}
+                      >
+                        <Upload className="h-4 w-4 mr-1" />
+                        Ganti
+                      </Button>
+                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={removeImage}
+                      className="bg-white"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Hapus
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center w-full">
-                  <label htmlFor="featured_image" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <label 
+                    htmlFor="featured_image" 
+                    className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                      isDragging 
+                        ? 'border-blue-500 bg-blue-100' 
+                        : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                    }`}
+                    onDragEnter={handleDragEnter}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                      <Upload className={`w-10 h-10 mb-3 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
                       <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                        <span className="font-semibold">{isDragging ? 'Drop gambar di sini' : 'Klik untuk upload'}</span> {!isDragging && 'atau drag and drop'}
                       </p>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF hingga 10MB</p>
                     </div>
                     <input
                       id="featured_image"

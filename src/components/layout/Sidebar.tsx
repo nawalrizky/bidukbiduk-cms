@@ -23,12 +23,12 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const navigation = [
   {
-    name: 'Gallery',
+    name: 'Galeri',
     href: '/gallery',
     icon: Camera,
   },
   {
-    name: 'Articles',
+    name: 'Artikel',
     href: '/articles',
     icon: FileText,
   },
@@ -58,7 +58,7 @@ const navigation = [
     icon: Building,
   },
   {
-    name: 'Package',
+    name: 'Paket',
     href: '/package',
     icon: Package,
   },
@@ -147,7 +147,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             onClick={handleLogout}
           >
             <LogOut className="mr-3 h-5 w-5" />
-            Logout
+            Keluar
           </Button>
         </div>
       </div>

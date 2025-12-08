@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal';
@@ -10,13 +11,12 @@ import {
   Search, 
   MapPin, 
   DollarSign, 
-  Eye, 
-  EyeOff, 
   Edit, 
   Trash2,
   ExternalLink,
   FolderOpen,
-  Loader2
+  Loader2,
+  Info
 } from 'lucide-react';
 import { 
   getDestinations, 
@@ -37,7 +37,8 @@ export default function DestinationPage() {
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [showActiveOnly, setShowActiveOnly] = useState(false);
+  const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -105,9 +106,8 @@ export default function DestinationPage() {
                          destination.location.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === null || destination.category.id === selectedCategory;
-    const matchesActive = !showActiveOnly || destination.is_active;
     
-    return matchesSearch && matchesCategory && matchesActive;
+    return matchesSearch && matchesCategory;
   });
 
   if (loading) {
@@ -196,16 +196,6 @@ export default function DestinationPage() {
                 ))}
               </select>
             </div>
-
-            {/* Active Filter */}
-            <Button
-              variant={showActiveOnly ? "default" : "outline"}
-              onClick={() => setShowActiveOnly(!showActiveOnly)}
-              className="flex items-center space-x-2"
-            >
-              {showActiveOnly ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              <span>{showActiveOnly ? 'Active Only' : 'All Status'}</span>
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -225,7 +215,7 @@ export default function DestinationPage() {
             <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No destinations found</p>
             <p className="text-gray-400 text-sm mt-2">
-              {searchTerm || selectedCategory || showActiveOnly 
+              {searchTerm || selectedCategory
                 ? 'Try adjusting your filters' 
                 : 'Get started by adding your first destination'
               }
@@ -244,16 +234,20 @@ export default function DestinationPage() {
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {destination.category.name}
                       </span>
-                      <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        destination.is_active 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {destination.is_active ? 'Active' : 'Inactive'}
-                      </span>
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedDestination(destination);
+                        setShowDetailModal(true);
+                      }}
+                      title="View Details"
+                    >
+                      <Info className="h-4 w-4" />
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -320,6 +314,151 @@ export default function DestinationPage() {
         itemType="Destination"
         isDeleting={deleteLoading !== null}
       />
+
+      {/* Detail Modal */}
+      {showDetailModal && selectedDestination && (
+        <div 
+          className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDetailModal(false)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedDestination.name}</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <span className="text-2xl">&times;</span>
+              </Button>
+            </div>
+
+            {/* Destination Image */}
+            {selectedDestination.images && (
+              <div className="relative w-full h-64 bg-gray-200">
+                <Image
+                  src={selectedDestination.images}
+                  alt={selectedDestination.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-4">
+              {/* Category */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Kategori</h3>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  {selectedDestination.category.name}
+                </span>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Deskripsi</h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{selectedDestination.description}</p>
+              </div>
+
+              {/* Location */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Lokasi</h3>
+                <div className="flex items-start">
+                  <MapPin className="h-5 w-5 mr-2 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-gray-700">{selectedDestination.location}</p>
+                </div>
+              </div>
+
+              {/* Coordinates */}
+              {selectedDestination.latitude && selectedDestination.longitude && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Koordinat</h3>
+                  <p className="text-gray-700">
+                    Lat: {selectedDestination.latitude}, Long: {selectedDestination.longitude}
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => window.open(`https://www.openstreetmap.org/#map=15/${selectedDestination.latitude}/${selectedDestination.longitude}`, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Lihat di Peta
+                  </Button>
+                </div>
+              )}
+
+              {/* Entrance Fee */}
+              {selectedDestination.entrance_fee && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Biaya Masuk</h3>
+                  <div className="flex items-center">
+                    <DollarSign className="h-5 w-5 mr-2 text-gray-400" />
+                    <p className="text-lg font-semibold text-gray-900">
+                      Rp {parseFloat(selectedDestination.entrance_fee).toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Operating Hours */}
+              {selectedDestination.operating_hours && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Jam Operasional</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedDestination.operating_hours}</p>
+                </div>
+              )}
+
+              {/* Contact */}
+              {selectedDestination.contact_info && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Kontak</h3>
+                  <p className="text-gray-700">{selectedDestination.contact_info}</p>
+                </div>
+              )}
+
+              {/* Facilities */}
+              {selectedDestination.facilities && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Fasilitas</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedDestination.facilities}</p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="pt-4 border-t flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    router.push(`/destination/edit-destination/${selectedDestination.id}`);
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Destinasi
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDetailModal(false)}
+                >
+                  Tutup
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

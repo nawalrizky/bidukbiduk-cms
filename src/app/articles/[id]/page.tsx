@@ -91,8 +91,8 @@ export default function ArticleDetailPage() {
     })
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (article: Article) => {
+    switch (article.status) {
       case 'published':
         return 'bg-green-100 text-green-800'
       case 'draft':
@@ -101,6 +101,19 @@ export default function ArticleDetailPage() {
         return 'bg-gray-100 text-gray-800'
       default:
         return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getStatusLabel = (article: Article) => {
+    switch (article.status) {
+      case 'published':
+        return 'Diterbitkan'
+      case 'draft':
+        return 'Draf'
+      case 'archived':
+        return 'Arsip'
+      default:
+        return article.status
     }
   }
 
@@ -159,10 +172,15 @@ export default function ArticleDetailPage() {
       {/* Article Content */}
       <Card className="p-8">
         {/* Status Badge */}
-        <div className="mb-4">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(article.status)}`}>
-            {article.status.charAt(0).toUpperCase() + article.status.slice(1)}
+        <div className="mb-4 space-y-2">
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(article)}`}>
+            {getStatusLabel(article)}
           </span>
+          {article.status === 'draft' && article.publish_date && new Date(article.publish_date) > new Date() && (
+            <p className="text-sm text-blue-600 mt-2">
+              📅 Artikel ini akan dipublikasikan pada {formatDate(article.publish_date)}
+            </p>
+          )}
         </div>
 
         {/* Title */}

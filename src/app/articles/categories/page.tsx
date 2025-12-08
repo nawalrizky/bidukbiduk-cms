@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Modal } from '@/components/ui/modal'
 import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal'
-import { ArrowLeft, Plus, Edit, Trash2, Loader2, Tag, Save, X } from 'lucide-react'
+import { ArrowLeft, Plus, Edit, Trash2, Loader2, Tag, Save } from 'lucide-react'
 import { 
   getArticleCategories, 
   createArticleCategory, 
@@ -173,7 +174,7 @@ export default function ArticleCategoriesPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -194,74 +195,63 @@ export default function ArticleCategoriesPage() {
         </div>
       </div>
 
-      {/* Add/Edit Form */}
-      {(showAddForm || editingId) && (
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
-              {editingId ? 'Edit Category' : 'Add New Category'}
-            </h2>
+      {/* Add/Edit Modal */}
+      <Modal
+        isOpen={showAddForm || editingId !== null}
+        onClose={resetForm}
+        title={editingId ? 'Edit Category' : 'Add New Category'}
+        size="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Category Name *</Label>
+            <Input
+              id="name"
+              placeholder="Enter category name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              required
+              disabled={submitting}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter category description (optional)"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              rows={3}
+              disabled={submitting}
+            />
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-4">
             <Button
-              variant="ghost"
-              size="sm"
+              type="button"
+              variant="outline"
               onClick={resetForm}
               disabled={submitting}
             >
-              <X className="h-4 w-4" />
+              Cancel
+            </Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {editingId ? 'Update' : 'Create'}
+                </>
+              )}
             </Button>
           </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Category Name *</Label>
-              <Input
-                id="name"
-                placeholder="Enter category name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                required
-                disabled={submitting}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter category description (optional)"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                rows={3}
-                disabled={submitting}
-              />
-            </div>
-            
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetForm}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {editingId ? 'Update' : 'Create'}
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      )}
+        </form>
+      </Modal>
 
       {/* Categories List */}
       <Card>

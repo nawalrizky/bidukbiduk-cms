@@ -17,10 +17,15 @@ export default function WebsiteAnalyticsPage() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => window.open('https://umami-sigma-ashen.vercel.app/share/TAquwr3D0uOM0kWh/umami-test-chi.vercel.app', '_blank')}
+            onClick={() =>
+              window.open(
+                'https://umami-sigma-ashen.vercel.app/share/ESmSmo71hEkshpMt/bidukbiduk.com',
+                '_blank'
+              )
+            }
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             Open Full Dashboard
@@ -44,7 +49,7 @@ export default function WebsiteAnalyticsPage() {
         <CardContent className="p-0">
           <div className="w-full h-[600px] relative">
             <iframe
-              src="https://umami-sigma-ashen.vercel.app/share/TAquwr3D0uOM0kWh/bidukbiduk.com"
+              src="https://umami-sigma-ashen.vercel.app/share/ESmSmo71hEkshpMt/bidukbiduk.com"
               className="w-full h-full border-0 rounded-b-lg"
               title="Umami Analytics Dashboard"
               loading="lazy"

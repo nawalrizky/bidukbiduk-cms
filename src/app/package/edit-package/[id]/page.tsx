@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, X, Save, Loader2 } from "lucide-react";
+import { MediaUploader, MediaFile } from "@/components/ui/media-uploader";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { getPackage, updatePackage } from "@/lib/api/packages";
 import { getDestinations } from "@/lib/api/destinations";
 import { Package, Destination } from "@/lib/types";
@@ -35,8 +35,7 @@ export default function EditPackagePage({
   const [pageLoading, setPageLoading] = useState(true);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [existingPackage, setExistingPackage] = useState<Package | null>(null);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -71,9 +70,18 @@ export default function EditPackagePage({
           destination_ids: packageData.destinations ? packageData.destinations.map(dest => dest.id) : [],
         });
 
-        // Set existing image preview
+        // Set existing image preview - convert to MediaFile if exists
         if (packageData.image_url) {
-          setImagePreview(packageData.image_url);
+          // Create a MediaFile from the existing image URL
+          const response = await fetch(packageData.image_url);
+          const blob = await response.blob();
+          const file = new File([blob], "existing-image.jpg", { type: blob.type });
+          setMediaFiles([{
+            file,
+            preview: packageData.image_url,
+            type: 'image',
+            id: `existing-${Date.now()}`
+          }]);
         }
 
       } catch (error) {
@@ -96,41 +104,6 @@ export default function EditPackagePage({
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        addNotification({
-          type: "error",
-          title: "File too large",
-          message: "Please select an image smaller than 5MB.",
-        });
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        addNotification({
-          type: "error",
-          title: "Invalid file type",
-          message: "Please select a valid image file.",
-        });
-        return;
-      }
-
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
   };
 
   const toggleDestination = (destinationId: number) => {
@@ -198,8 +171,8 @@ export default function EditPackagePage({
       });
 
       // Add image if selected (new image)
-      if (selectedImage) {
-        submitData.append("image", selectedImage);
+      if (mediaFiles[0]?.file) {
+        submitData.append("image", mediaFiles[0].file);
       }
 
       console.log("Form data before submission:");
@@ -378,49 +351,14 @@ export default function EditPackagePage({
           {/* Package Image */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Package Image</h2>
-            <div className="space-y-4">
-              {imagePreview ? (
-                <div className="relative">
-                  <Image
-                    src={imagePreview}
-                    alt="Package preview"
-                    width={400}
-                    height={192}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleRemoveImage}
-                    className="absolute top-2 right-2"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                  {selectedImage && (
-                    <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                      New Image
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600 mb-2">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, GIF up to 5MB
-                  </p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-              )}
-            </div>
+            <MediaUploader
+              label=""
+              acceptImages={true}
+              multiple={false}
+              maxSizeMB={5}
+              value={mediaFiles}
+              onChange={setMediaFiles}
+            />
           </Card>
 
           {/* Destinations */}

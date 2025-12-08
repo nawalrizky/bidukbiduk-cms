@@ -1,25 +1,24 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Upload, Calendar, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { MediaUploader, MediaFile } from '@/components/ui/media-uploader'
+import { Calendar, Loader2 } from 'lucide-react'
 import { useNotifications } from '@/contexts/NotificationContext'
 import { createInstagramPost } from '@/lib/api/instagram'
 
 export default function SocmedUploaderPage() {
   const [loading, setLoading] = useState(false)
-  const [mediaPreview, setMediaPreview] = useState<string | null>(null)
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([])
   const { addNotification } = useNotifications()
   
   const [formData, setFormData] = useState({
     post_type: 'photo',
     caption: '',
-    media: null as File | null,
     scheduled_at: '',
     status: 'scheduled',
     extras: '',
@@ -28,20 +27,6 @@ export default function SocmedUploaderPage() {
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFormData(prev => ({ ...prev, media: file }))
-      
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setMediaPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +42,7 @@ export default function SocmedUploaderPage() {
       return
     }
 
-    if (!formData.media) {
+    if (!mediaFiles[0]?.file) {
       addNotification({
         type: 'error',
         title: 'Validation Error',
@@ -81,7 +66,7 @@ export default function SocmedUploaderPage() {
       await createInstagramPost({
         post_type: formData.post_type,
         caption: formData.caption,
-        media: formData.media,
+        media: mediaFiles[0].file,
         scheduled_at: formData.scheduled_at || undefined,
         status: formData.status,
         extras: formData.extras || undefined,
@@ -98,13 +83,12 @@ export default function SocmedUploaderPage() {
       setFormData({
         post_type: 'photo',
         caption: '',
-        media: null,
         scheduled_at: '',
         status: 'scheduled',
         extras: '',
         session: 0
       })
-      setMediaPreview(null)
+      setMediaFiles([])
       
     } catch (error: unknown) {
       console.error('Error creating post:', error)
@@ -158,30 +142,17 @@ export default function SocmedUploaderPage() {
 
           {/* Media Upload */}
           <div className="space-y-2">
-            <Label htmlFor="media">Media File *</Label>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <Input
-                  id="media"
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleMediaUpload}
-                  className="cursor-pointer"
-                />
-              </div>
-              {mediaPreview && (
-                <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200 relative">
-                  <Image 
-                    src={mediaPreview} 
-                    alt="Preview" 
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-            </div>
+            <MediaUploader
+              label="Media File *"
+              acceptImages={true}
+              acceptVideos={true}
+              multiple={false}
+              maxSizeMB={100}
+              value={mediaFiles}
+              onChange={setMediaFiles}
+            />
             <p className="text-sm text-gray-500">
-              Upload the image or video for your post
+              Upload an image or video for your social media post
             </p>
           </div>
 
@@ -275,13 +246,12 @@ export default function SocmedUploaderPage() {
                 setFormData({
                   post_type: 'photo',
                   caption: '',
-                  media: null,
                   scheduled_at: '',
                   status: 'scheduled',
                   extras: '',
                   session: 0
                 })
-                setMediaPreview(null)
+                setMediaFiles([])
               }}
               disabled={loading}
             >
@@ -295,7 +265,6 @@ export default function SocmedUploaderPage() {
                 </>
               ) : (
                 <>
-                  <Upload className="h-4 w-4 mr-2" />
                   {formData.status === 'scheduled' ? 'Schedule Post' : 'Create Post'}
                 </>
               )}
@@ -307,7 +276,7 @@ export default function SocmedUploaderPage() {
       {/* Info Card */}
       <Card className="p-4 bg-blue-50 border-blue-200">
         <div className="flex items-start space-x-3">
-          <ImageIcon className="h-5 w-5 text-blue-600 mt-0.5" />
+          <Calendar className="h-5 w-5 text-blue-600 mt-0.5" />
           <div className="flex-1">
             <h3 className="font-medium text-blue-900 mb-1">Post Guidelines</h3>
             <ul className="text-sm text-blue-800 space-y-1">

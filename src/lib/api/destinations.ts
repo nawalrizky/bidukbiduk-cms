@@ -7,6 +7,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 300000, // 5 minutes timeout for large video uploads
+  maxContentLength: Infinity,
+  maxBodyLength: Infinity,
   // Don't set default Content-Type, let axios handle it based on data type
 });
 
@@ -80,7 +83,17 @@ export const createDestination = async (destination: CreateDestination | FormDat
   
   try {
     // For FormData, let axios set the Content-Type automatically with boundary
-    const response = await api.post('/destinations/', destination);
+    const response = await api.post('/destinations/', destination, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = progressEvent.total 
+          ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          : 0;
+        console.log(`Upload progress: ${percentCompleted}%`);
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Request failed. Error details:');
@@ -89,6 +102,7 @@ export const createDestination = async (destination: CreateDestination | FormDat
       console.error('Axios error response:', error.response?.data);
       console.error('Status:', error.response?.status);
       console.error('Headers:', error.response?.headers);
+      console.error('Error code:', error.code);
     }
     console.error('Error uploading image:', error);
     throw error;
@@ -101,7 +115,17 @@ export const updateDestination = async (id: number, destination: CreateDestinati
   
   try {
     // For FormData, let axios set the Content-Type automatically with boundary
-    const response = await api.put(`/destinations/${id}/`, destination);
+    const response = await api.put(`/destinations/${id}/`, destination, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = progressEvent.total 
+          ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          : 0;
+        console.log(`Upload progress: ${percentCompleted}%`);
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Update request failed. Error details:');
@@ -110,6 +134,7 @@ export const updateDestination = async (id: number, destination: CreateDestinati
       console.error('Axios error response:', error.response?.data);
       console.error('Status:', error.response?.status);
       console.error('Headers:', error.response?.headers);
+      console.error('Error code:', error.code);
     }
     console.error('Error updating destination:', error);
     throw error;

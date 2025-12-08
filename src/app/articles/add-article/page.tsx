@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Save, Loader2, Upload, X } from 'lucide-react'
+import { MediaUploader, MediaFile } from '@/components/ui/media-uploader'
+import { ArrowLeft, Save, Loader2 } from 'lucide-react'
 import { createArticle, getArticleCategories } from '@/lib/api/articles'
 import { ArticleCategory } from '@/lib/types'
 import { useNotifications } from '@/contexts/NotificationContext'
@@ -17,18 +17,16 @@ export default function AddArticlePage() {
   const router = useRouter()
   const { addNotification } = useNotifications()
   const [loading, setLoading] = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
   const [categories, setCategories] = useState<ArticleCategory[]>([])
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([])
 
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    featured_image: null as File | null,
     category: 0,
     tags: '',
-    status: 'published' as 'draft' | 'published' | 'archived',
-    publish_date: ''
+    status: 'published' as 'draft' | 'published' | 'archived'
   })
 
   useEffect(() => {
@@ -57,66 +55,7 @@ export default function AddArticlePage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleFileSelect = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      addNotification({
-        type: 'error',
-        title: 'Invalid File',
-        message: 'Please select an image file'
-      })
-      return
-    }
-
-    setFormData(prev => ({ ...prev, featured_image: file }))
-    
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      handleFileSelect(file)
-    }
-  }
-
-  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      handleFileSelect(file)
-    }
-  }
-
-  const removeImage = () => {
-    setFormData(prev => ({ ...prev, featured_image: null }))
-    setImagePreview(null)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, saveAsDraft: boolean = false) => {
     e.preventDefault()
     
     if (!formData.title.trim()) {
@@ -147,22 +86,33 @@ export default function AddArticlePage() {
     }
 
     try {
-      setLoading(true)
+      // Set loading state yang sesuai
+      if (saveAsDraft) {
+        setSavingDraft(true)
+      } else {
+        setLoading(true)
+      }
+      
+      // Determine status - sederhana: draft atau published
+      const status: 'draft' | 'published' = saveAsDraft ? 'draft' : 'published'
       
       await createArticle({
         title: formData.title,
         content: formData.content,
-        featured_image: formData.featured_image || undefined,
+        featured_image: mediaFiles[0]?.file || undefined,
         category: formData.category,
         tags: formData.tags || undefined,
-        status: formData.status,
-        publish_date: formData.publish_date || undefined
+        status: status
       })
+
+      const message = saveAsDraft 
+        ? 'Artikel disimpan sebagai draft' 
+        : 'Artikel berhasil dipublikasikan'
 
       addNotification({
         type: 'success',
         title: 'Article Created',
-        message: 'Article has been created successfully'
+        message: message
       })
 
       router.push('/articles')
@@ -176,13 +126,8 @@ export default function AddArticlePage() {
       })
     } finally {
       setLoading(false)
+      setSavingDraft(false)
     }
-  }
-
-  const getMinDateTime = () => {
-    const now = new Date()
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-    return now.toISOString().slice(0, 16)
   }
 
   return (
@@ -235,78 +180,18 @@ export default function AddArticlePage() {
             </div>
 
             {/* Featured Image */}
-            <div className="space-y-2">
-              <Label htmlFor="featured_image">Featured Image</Label>
-              {imagePreview ? (
-                <div className="relative">
-                  <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-gray-200">
-                    <Image
-                      src={imagePreview}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="absolute top-2 right-2 flex gap-2">
-                    <label htmlFor="featured_image">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="bg-white cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.getElementById('featured_image')?.click();
-                        }}
-                      >
-                        <Upload className="h-4 w-4 mr-1" />
-                        Ganti
-                      </Button>
-                    </label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={removeImage}
-                      className="bg-white"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Hapus
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center w-full">
-                  <label 
-                    htmlFor="featured_image" 
-                    className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                      isDragging 
-                        ? 'border-blue-500 bg-blue-100' 
-                        : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
-                    }`}
-                    onDragEnter={handleDragEnter}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className={`w-10 h-10 mb-3 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
-                      <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">{isDragging ? 'Drop gambar di sini' : 'Klik untuk upload'}</span> {!isDragging && 'atau drag and drop'}
-                      </p>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF hingga 10MB</p>
-                    </div>
-                    <input
-                      id="featured_image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              )}
-            </div>
+            <MediaUploader
+              label="Featured Image"
+              acceptImages={true}
+              acceptVideos={false}
+              multiple={false}
+              maxSizeMB={10}
+              value={mediaFiles}
+              onChange={setMediaFiles}
+              showPreview={true}
+              previewSize="lg"
+              helperText="Upload gambar utama untuk artikel (PNG, JPG, GIF)"
+            />
 
             {/* Content */}
             <div className="space-y-2">
@@ -339,46 +224,55 @@ export default function AddArticlePage() {
                 Separate multiple tags with commas
               </p>
             </div>
-
-            {/* Publish Date */}
-            <div className="space-y-2">
-              <Label htmlFor="publish_date">Publish Date</Label>
-              <Input
-                id="publish_date"
-                type="datetime-local"
-                value={formData.publish_date}
-                onChange={(e) => handleInputChange('publish_date', e.target.value)}
-                min={getMinDateTime()}
-              />
-              <p className="text-sm text-gray-500">
-                Leave empty to use current date/time
-              </p>
-            </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-4 pt-6 mt-6 border-t">
+          {/* Submit Buttons */}
+          <div className="flex justify-between items-center pt-6 mt-6 border-t">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.push('/articles')}
-              disabled={loading}
+              disabled={loading || savingDraft}
             >
-              Cancel
+              Batal
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Create Article
-                </>
-              )}
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={(e) => handleSubmit(e, true)}
+                disabled={loading || savingDraft}
+              >
+                {savingDraft ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Simpan sebagai Draft
+                  </>
+                )}
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={loading || savingDraft}
+                onClick={(e) => handleSubmit(e, false)}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Publish Artikel
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </Card>
       </form>

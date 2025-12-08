@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaUploader, MediaFile } from "@/components/ui/media-uploader";
 import { useNotifications } from '@/contexts/NotificationContext';
 import { getErrorMessage, getErrorTitle } from '@/lib/utils/errorUtils';
 import {
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, MapPin, Save, Loader2, Upload, X } from "lucide-react";
+import { ArrowLeft, MapPin, Save, Loader2 } from "lucide-react";
 
 // Dynamically import the map component to avoid SSR issues
 const MapPicker = dynamic(() => import("./MapPicker"), {
@@ -40,7 +41,7 @@ export default function AddDestinationPage() {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<DestinationCategory[]>([]);
   const [coordinates, setCoordinates] = useState(""); // Single coordinate input
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
   const [formData, setFormData] = useState<CreateDestination>({
     name: "",
@@ -136,19 +137,6 @@ export default function AddDestinationPage() {
     return { type: "success", message: "Coordinates are valid" };
   };
 
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setSelectedImages(Array.from(files));
-    }
-  };
-
-  // Remove selected file
-  const removeImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -164,11 +152,11 @@ export default function AddDestinationPage() {
         return;
       }
 
-      if (selectedImages.length === 0) {
+      if (mediaFiles.length === 0) {
         addNotification({
           type: 'error',
           title: 'Validation Error',
-          message: 'Please select at least one image'
+          message: 'Please select at least one image or video'
         });
         return;
       }
@@ -209,9 +197,9 @@ export default function AddDestinationPage() {
         return;
       }
       
-      // Append image files
-      selectedImages.forEach((file) => {
-        submitData.append(`images`, file);
+      // Append image and video files
+      mediaFiles.forEach((mediaFile) => {
+        submitData.append(`images`, mediaFile.file);
       });
 
       // Debug: Log FormData contents
@@ -492,43 +480,19 @@ export default function AddDestinationPage() {
               </div>
 
               <div className="md:col-span-2">
-                <Label htmlFor="images" className="flex items-center gap-2 ">
-                  <Upload className="h-4 w-4" />
-                  Images *
-                </Label>
-                <Input
-                  id="images"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileChange}
-                  className="file:mr-2 py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                <MediaUploader
+                  label="Images"
+                  acceptImages={true}
+                  acceptVideos={false}
+                  multiple={true}
+                  maxFiles={10}
+                  maxSizeMB={10}
+                  value={mediaFiles}
+                  onChange={setMediaFiles}
+                  showPreview={true}
+                  previewSize="md"
+                  helperText="Upload gambar untuk destinasi (max 10 file, 10MB per file)"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Select one or more image files (JPG, PNG, GIF, WebP). Maximum file size: 10MB per image.
-                </p>
-                
-                {/* Display selected files */}
-                {selectedImages.length > 0 && (
-                  <div className="mt-2 space-y-2">
-                    <p className="text-sm font-medium text-gray-700">Selected files:</p>
-                    <div className="space-y-1">
-                      {selectedImages.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <span className="text-sm text-gray-700">{file.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
-                          >
-                            <X className="h-3 w-3" />
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </Card>

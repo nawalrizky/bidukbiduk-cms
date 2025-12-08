@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Upload, X, Save, Loader2 } from "lucide-react";
+import { MediaUploader, MediaFile } from "@/components/ui/media-uploader";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { createHotel } from "@/lib/api/hotels";
 import { useNotifications } from "@/contexts/NotificationContext";
 
@@ -27,9 +27,7 @@ export default function AddHotelPage() {
   const router = useRouter();
   const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -47,89 +45,6 @@ export default function AddHotelPage() {
       ...prev,
       [field]: value
     }));
-  };
-
-  const processImageFiles = (files: File[]) => {
-    if (files.length === 0) return;
-
-    // Validate file types
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
-    
-    if (invalidFiles.length > 0) {
-      addNotification({
-        type: "error",
-        title: "Invalid file type",
-        message: "Please select only valid image files.",
-      });
-      return;
-    }
-
-    // Validate file sizes (5MB each)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const oversizedFiles = files.filter(file => file.size > maxSize);
-    
-    if (oversizedFiles.length > 0) {
-      addNotification({
-        type: "error",
-        title: "File too large",
-        message: "Each image must be less than 5MB.",
-      });
-      return;
-    }
-
-    // Add to existing images
-    const newImages = [...selectedImages, ...files];
-    setSelectedImages(newImages);
-
-    // Create previews for new files
-    const newPreviews = [...imagePreviews];
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        newPreviews.push(reader.result as string);
-        setImagePreviews([...newPreviews]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    processImageFiles(files);
-  };
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    
-    const files = Array.from(e.dataTransfer.files || []);
-    processImageFiles(files);
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    const newPreviews = imagePreviews.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
-    setImagePreviews(newPreviews);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -189,8 +104,8 @@ export default function AddHotelPage() {
       });
 
       // Add images if selected
-      selectedImages.forEach((image) => {
-        submitData.append("images", image);
+      mediaFiles.forEach((media) => {
+        submitData.append("images", media.file);
       });
 
       console.log("Form data before submission:");
@@ -365,66 +280,15 @@ export default function AddHotelPage() {
         {/* Hotel Images */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Hotel Images</h2>
-          <div className="space-y-4">
-            {/* Image Grid */}
-            {imagePreviews.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <Image
-                      src={preview}
-                      alt={`Hotel preview ${index + 1}`}
-                      width={300}
-                      height={200}
-                      className="w-full h-40 object-cover rounded-lg"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute top-2 right-2"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                    <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                      {index + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Upload Area */}
-            <div 
-              className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                isDragging 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-              onDragEnter={handleDragEnter}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
-              <p className="text-sm text-gray-600 mb-2">
-                {isDragging 
-                  ? 'Drop gambar di sini'
-                  : (imagePreviews.length > 0 ? "Tambah lebih banyak gambar" : "Klik untuk upload atau drag and drop")}
-              </p>
-              <p className="text-xs text-gray-500">
-                PNG, JPG, GIF hingga 5MB per gambar. Pilih beberapa file.
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageSelect}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </div>
-          </div>
+          <MediaUploader
+            label=""
+            acceptImages={true}
+            multiple={true}
+            maxFiles={10}
+            maxSizeMB={5}
+            value={mediaFiles}
+            onChange={setMediaFiles}
+          />
         </Card>
 
         {/* Submit Button */}

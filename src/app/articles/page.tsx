@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { DeleteModal, useDeleteModal } from '@/components/ui/delete-modal'
-import { Plus, Search, FileText, Edit, Trash2, Loader2, Calendar, User, Tag } from 'lucide-react'
+import { Plus, Search, FileText, Edit, Trash2, Loader2, Calendar, Tag } from 'lucide-react'
 import { getArticles, deleteArticle } from '@/lib/api/articles'
 import { Article } from '@/lib/types'
 import { useNotifications } from '@/contexts/NotificationContext'
@@ -17,7 +17,6 @@ export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('')
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null)
   
   const deleteModal = useDeleteModal()
@@ -86,8 +85,8 @@ export default function ArticlesPage() {
     const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = !statusFilter || article.status === statusFilter
-    return matchesSearch && matchesStatus
+    
+    return matchesSearch
   })
 
   // Format date
@@ -101,8 +100,8 @@ export default function ArticlesPage() {
   }
 
   // Get status badge color
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (article: Article) => {
+    switch (article.status) {
       case 'published':
         return 'bg-green-100 text-green-800'
       case 'draft':
@@ -111,6 +110,20 @@ export default function ArticlesPage() {
         return 'bg-gray-100 text-gray-800'
       default:
         return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  // Get status label
+  const getStatusLabel = (article: Article) => {
+    switch (article.status) {
+      case 'published':
+        return 'Diterbitkan'
+      case 'draft':
+        return 'Draf'
+      case 'archived':
+        return 'Arsip'
+      default:
+        return article.status
     }
   }
 
@@ -156,32 +169,16 @@ export default function ArticlesPage() {
         </div>
       </div>
 
-      {/* Search and Filter */}
+      {/* Search */}
       <Card className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Cari artikel..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <div className="w-full sm:w-48">
-              <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="">Semua Status</option>
-              <option value="published">Diterbitkan</option>
-              <option value="draft">Draf</option>
-              <option value="archived">Arsip</option>
-            </select>
-          </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Cari artikel..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
         </div>
       </Card>
 
@@ -191,14 +188,14 @@ export default function ArticlesPage() {
           <div className="flex flex-col items-center justify-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm || statusFilter ? 'Artikel tidak ditemukan' : 'Belum ada artikel'}
+              {searchTerm ? 'Artikel tidak ditemukan' : 'Belum ada artikel'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {searchTerm || statusFilter
-                ? 'Coba ubah kriteria pencarian atau filter.' 
+              {searchTerm
+                ? 'Coba ubah kriteria pencarian.' 
                 : 'Mulai dengan membuat artikel pertama Anda.'}
             </p>
-            {!searchTerm && !statusFilter && (
+            {!searchTerm && (
               <Button onClick={() => router.push('/articles/add-article')}>
                 <Plus className="mr-2 h-4 w-4" />
                 Buat Artikel Pertama
@@ -227,8 +224,8 @@ export default function ArticlesPage() {
                     </div>
                   )}
                   <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(article.status)}`}>
-                      {article.status.charAt(0).toUpperCase() + article.status.slice(1)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(article)}`}>
+                      {getStatusLabel(article)}
                     </span>
                   </div>
                 </div>
@@ -257,8 +254,7 @@ export default function ArticlesPage() {
                     
                     {/* Author and Date */}
                     <div className="flex items-center text-sm text-gray-600">
-                      <User className="h-4 w-4 mr-1" />
-                      <span className="mr-3">{article.author_name || 'Unknown'}</span>
+                    
                       <Calendar className="h-4 w-4 mr-1" />
                       <span>{formatDate(article.publish_date || article.created_at)}</span>
                     </div>

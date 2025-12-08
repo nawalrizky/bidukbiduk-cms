@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaUploader, MediaFile } from "@/components/ui/media-uploader";
 import { useNotifications } from '@/contexts/NotificationContext';
 import { getErrorMessage, getErrorTitle } from '@/lib/utils/errorUtils';
 import {
@@ -24,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, MapPin, Save, Loader2, Upload, X } from "lucide-react";
+import { ArrowLeft, MapPin, Save, Loader2 } from "lucide-react";
 
 // Dynamically import the map component to avoid SSR issues
 const MapPicker = dynamic(() => import("../../add-destination/MapPicker"), {
@@ -45,8 +46,8 @@ export default function EditDestinationPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [categories, setCategories] = useState<DestinationCategory[]>([]);
   const [coordinates, setCoordinates] = useState(""); // Single coordinate input
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [existingImages, setExistingImages] = useState<{id: number, image_url: string}[]>([]);
 
   const [formData, setFormData] = useState<CreateDestination>({
     name: "",
@@ -99,33 +100,27 @@ export default function EditDestinationPage() {
             is_active: destination.is_active !== undefined ? destination.is_active : true,
           });
 
-          // Handle images - can be string, array, or other format
-          if (destination.images) {
-            let imageUrls: string[] = [];
+          // Handle images - can be string, array, or object array
+          if (destination.images && destination.images.length > 0) {
             const images = destination.images as unknown;
             
-            if (typeof images === 'string') {
-              // If it's a string, try to parse as JSON or treat as single URL
-              try {
-                const parsed = JSON.parse(images);
-                if (Array.isArray(parsed)) {
-                  imageUrls = parsed;
-                } else {
-                  imageUrls = [images];
+            if (Array.isArray(images)) {
+              const normalizedImages = images.map((img: unknown, index: number) => {
+                if (typeof img === 'string') {
+                  return { id: index, image_url: img };
+                } else if (typeof img === 'object' && img !== null) {
+                  const imgObj = img as { id?: number; image_url?: string; image?: string; url?: string };
+                  return {
+                    id: imgObj.id ?? index,
+                    image_url: imgObj.image_url || imgObj.image || imgObj.url || ''
+                  };
                 }
-              } catch {
-                // If not JSON, treat as single URL
-                imageUrls = [images];
-              }
-            } else if (Array.isArray(images)) {
-              // If it's already an array
-              imageUrls = images.map((img: unknown) => 
-                typeof img === 'string' ? img : (img as { image?: string; url?: string }).image || (img as { image?: string; url?: string }).url || ''
-              ).filter((url: string) => url);
+                return { id: index, image_url: '' };
+              }).filter(img => img.image_url);
+              
+              console.log('Processed existing images:', normalizedImages);
+              setExistingImages(normalizedImages);
             }
-            
-            console.log('Processed image URLs:', imageUrls);
-            setExistingImages(imageUrls);
           }
 
           // Set coordinates for display
@@ -206,16 +201,9 @@ export default function EditDestinationPage() {
 
   // Note: MapPicker is read-only, location selection is handled by coordinate input
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newImages = Array.from(files);
-      setSelectedImages(prev => [...prev, ...newImages]);
-    }
-  };
-
-  const removeSelectedImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  const handleRemoveExistingImage = (imageId: number) => {
+    const updatedExisting = existingImages.filter(img => img.id !== imageId);
+    setExistingImages(updatedExisting);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -269,9 +257,14 @@ export default function EditDestinationPage() {
         return;
       }
       
-      // Append new image files if any
-      selectedImages.forEach((file) => {
-        submitData.append(`images`, file);
+      // Append new image/video files if any
+      mediaFiles.forEach((mediaFile) => {
+        submitData.append(`images`, mediaFile.file);
+      });
+      
+      // Add existing image IDs to keep
+      existingImages.forEach((image) => {
+        submitData.append("existing_image_ids", image.id.toString());
       });
 
       // Debug: Log FormData contents
@@ -510,28 +503,34 @@ export default function EditDestinationPage() {
             </div>
           </Card>
 
-          {/* Images */}
+          {/* Images & Videos */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Images
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">Images</h2>
             
             {/* Existing Images */}
             {existingImages.length > 0 && (
-              <div className="mb-4">
-                <Label>Current Images</Label>
+              <div className="mb-6">
+                <Label>Current Media</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                  {existingImages.map((imageUrl, index) => (
-                    <div key={index} className="relative">
+                  {existingImages.map((image, index) => (
+                    <div key={image.id} className="relative group">
                       <Image
-                        src={imageUrl}
+                        src={image.image_url}
                         alt={`Current ${index + 1}`}
                         width={200}
                         height={96}
                         className="w-full h-24 object-cover rounded-lg"
                       />
-                      <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveExistingImage(image.id)}
+                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        ✕
+                      </Button>
+                      <div className="absolute top-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
                         Current
                       </div>
                     </div>
@@ -540,48 +539,20 @@ export default function EditDestinationPage() {
               </div>
             )}
             
-            {/* New Images Upload */}
-            <div>
-              <Label htmlFor="images">Add New Images</Label>
-              <Input
-                id="images"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="mt-1"
-              />
-            </div>
-
-            {/* Preview Selected Images */}
-            {selectedImages.length > 0 && (
-              <div className="mt-4">
-                <Label>New Images to Upload</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                  {selectedImages.map((file, index) => (
-                    <div key={index} className="relative">
-                      <Image
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${index + 1}`}
-                        width={200}
-                        height={96}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeSelectedImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                      <div className="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
-                        New
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* New Media Upload */}
+            <MediaUploader
+              label="Add New Images"
+              acceptImages={true}
+              acceptVideos={false}
+              multiple={true}
+              maxFiles={10}
+              maxSizeMB={10}
+              value={mediaFiles}
+              onChange={setMediaFiles}
+              showPreview={true}
+              previewSize="md"
+              helperText="Upload gambar baru untuk destinasi (max 10 file, 10MB per file)"
+            />
           </Card>
 
           {/* Submit Button */}

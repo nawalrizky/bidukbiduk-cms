@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Modal } from '@/components/ui/modal';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { getErrorMessage, getErrorTitle } from '@/lib/utils/errorUtils';
 import { 
@@ -205,103 +206,91 @@ export default function DestinationCategoriesPage() {
         </div>
       </div>
 
-      {/* Add/Edit Form */}
-      {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Category Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter category name"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="description">Description *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Enter category description"
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex items-center space-x-2"
-                >
-                  {formLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}
-                  <span>{formLoading ? 'Saving...' : 'Save Category'}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={resetForm}
-                  disabled={formLoading}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      {/* Add/Edit Modal */}
+      <Modal
+        isOpen={showAddForm}
+        onClose={resetForm}
+        title={editingCategory ? 'Edit Category' : 'Add New Category'}
+        size="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Category Name *</Label>
             <Input
-              type="text"
-              placeholder="Search categories..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Enter category name"
+              required
             />
           </div>
-        </CardContent>
-      </Card>
+          
+          <div>
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="Enter category description"
+              rows={3}
+              required
+            />
+          </div>
 
-      {/* Categories Grid */}
+          <div className="flex items-center justify-end space-x-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={resetForm}
+              disabled={formLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={formLoading}
+              className="flex items-center space-x-2"
+            >
+              {formLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              <span>{formLoading ? 'Saving...' : 'Save Category'}</span>
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Search */}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1 max-w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* Categories List */}
       {filteredCategories.length === 0 ? (
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <div className="text-gray-400 text-4xl mb-4">📂</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {searchTerm ? 'No categories found' : 'No categories yet'}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm ? 'Try adjusting your search terms.' : 'Get started by creating your first destination category.'}
+          <CardContent className="py-12">
+            <div className="text-center text-gray-500">
+              <p className="text-lg font-medium">No categories found</p>
+              <p className="text-sm mt-1">
+                {searchTerm 
+                  ? "Try a different search term" 
+                  : "Get started by creating your first category"}
               </p>
               {!searchTerm && (
-                <Button onClick={() => setShowAddForm(true)}>
+                <Button 
+                  className="mt-4"
+                  onClick={() => setShowAddForm(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Category
                 </Button>
@@ -312,60 +301,50 @@ export default function DestinationCategoriesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCategories.map((category) => (
-            <Card key={category.id} className="relative">
+            <Card key={category.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle className="text-lg">{category.name}</CardTitle>
-                <CardDescription className="text-sm text-gray-600">
-                  Created: {new Date(category.created_at).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 text-sm mb-4 line-clamp-3">
-                  {category.description}
-                </p>
-                
-                <div className="flex items-center justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(category)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Edit className="h-3 w-3" />
-                    <span>Edit</span>
-                  </Button>
-                  
-                  {deleteConfirm === category.id ? (
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(category.id)}
-                        className="flex items-center space-x-1"
-                      >
-                        <span>Confirm</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDeleteConfirm(null)}
-                      >
-                        <span>Cancel</span>
-                      </Button>
-                    </div>
-                  ) : (
+                <CardTitle className="flex items-center justify-between">
+                  <span className="truncate">{category.name}</span>
+                  <div className="flex items-center space-x-1">
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       size="sm"
-                      onClick={() => setDeleteConfirm(category.id)}
-                      className="flex items-center space-x-1"
+                      onClick={() => handleEdit(category)}
+                      title="Edit category"
                     >
-                      <Trash2 className="h-3 w-3" />
-                      <span>Delete</span>
+                      <Edit className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
-              </CardContent>
+                    {deleteConfirm === category.id ? (
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(category.id)}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteConfirm(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteConfirm(category.id)}
+                        title="Delete category"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    )}
+                  </div>
+                </CardTitle>
+                <CardDescription>{category.description}</CardDescription>
+              </CardHeader>
             </Card>
           ))}
         </div>

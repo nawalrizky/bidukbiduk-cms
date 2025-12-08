@@ -44,6 +44,7 @@ export default function SocmedManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingPost, setEditingPost] = useState<InstagramPost | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [isVideoPreview, setIsVideoPreview] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<InstagramPost | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -122,12 +123,15 @@ export default function SocmedManagementPage() {
     const file = e.target.files?.[0];
     if (file) {
       setFormData(prev => ({ ...prev, media: file }));
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setMediaPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+
+      // Revoke previous object URL if any
+      if (mediaPreview && mediaPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(mediaPreview);
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      setMediaPreview(objectUrl);
+      setIsVideoPreview(file.type.startsWith('video/'));
     }
   };
 
@@ -139,6 +143,7 @@ export default function SocmedManagementPage() {
       scheduled_at: '',
     });
     setMediaPreview(null);
+    setIsVideoPreview(false);
     setEditingPost(null);
   };
 
@@ -176,6 +181,7 @@ export default function SocmedManagementPage() {
     }
     
     setMediaPreview(mediaUrl);
+    setIsVideoPreview(post.post_type === 'video' || post.post_type === 'reel');
     setViewMode('edit');
   };
 
@@ -644,20 +650,28 @@ export default function SocmedManagementPage() {
             <div className="mt-1">
               {mediaPreview ? (
                 <div className="relative">
-                  <div className="relative h-64 bg-gray-100 rounded-md overflow-hidden">
-                    <Image
-                      src={mediaPreview}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                      onError={(e) => {
-                        console.error('Preview image load error:', {
-                          src: mediaPreview,
-                          error: e
-                        });
-                      }}
-                    />
+                  <div className="relative h-64 bg-gray-100 rounded-md overflow-hidden flex items-center justify-center">
+                    {isVideoPreview ? (
+                      <video
+                        src={mediaPreview}
+                        controls
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={mediaPreview}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                        unoptimized
+                        onError={(e) => {
+                          console.error('Preview image load error:', {
+                            src: mediaPreview,
+                            error: e
+                          });
+                        }}
+                      />
+                    )}
                   </div>
                   <Button
                     type="button"
@@ -666,6 +680,7 @@ export default function SocmedManagementPage() {
                     className="mt-2"
                     onClick={() => {
                       setMediaPreview(null);
+                      setIsVideoPreview(false);
                       setFormData(prev => ({ ...prev, media: null }));
                     }}
                     disabled={submitting}

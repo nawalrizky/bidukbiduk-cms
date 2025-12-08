@@ -3,16 +3,15 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, Upload, Check, X, Camera } from 'lucide-react'
+import { MediaUploader, MediaFile } from '@/components/ui/media-uploader'
+import { ArrowLeft, Check, X, Camera } from 'lucide-react'
 import { createGalleryItem } from '@/lib/api/gallery'
 import { CreateGalleryItem } from '@/lib/types'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { getSafeImageUrl } from '@/lib/utils/imageUtils'
 import { authService } from '@/lib/api/auth'
 
 export default function AddImagePage() {
@@ -20,6 +19,7 @@ export default function AddImagePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([])
   
   // Check authentication on component mount
   useEffect(() => {
@@ -41,65 +41,6 @@ export default function AddImagePage() {
     is_featured: true, // Default to featured
   });
 
-  const [previewUrl, setPreviewUrl] = useState<string>('')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-
-  // Handle file selection (shared by both click and drag & drop)
-  const handleFileSelect = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setError('Please select an image file')
-      return
-    }
-    
-    // Store the actual file object
-    setSelectedFile(file)
-    
-    // Create preview URL
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    
-    // Store the File object directly in form data
-    setFormData(prev => ({ ...prev, file }))
-  }
-
-  // Handle file input change
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      handleFileSelect(file)
-    }
-  }
-
-  // Handle drag & drop events
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      handleFileSelect(file)
-    }
-  }
-
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -119,7 +60,7 @@ export default function AddImagePage() {
       return
     }
     
-    if (!selectedFile) {
+    if (!mediaFiles[0]) {
       setError('Please select an image to upload')
       return
     }
@@ -131,7 +72,13 @@ export default function AddImagePage() {
       console.log('Submitting form data:', formData) // Debug log
       console.log('Auth token present:', !!authService.getAccessToken()) // Auth debug
       
-      const response = await createGalleryItem(formData)
+      // Update formData with the selected file
+      const submitData = {
+        ...formData,
+        file: mediaFiles[0].file
+      }
+      
+      const response = await createGalleryItem(submitData)
       
       if (response && response.id) {
         setSuccess(true)
@@ -144,8 +91,7 @@ export default function AddImagePage() {
           tags: '',
           is_featured: true,
         });
-        setPreviewUrl('')
-        setSelectedFile(null)
+        setMediaFiles([])
         
         // Redirect after short delay to show success message
         setTimeout(() => {
@@ -184,31 +130,7 @@ export default function AddImagePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Preview Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Image Preview</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            {previewUrl ? (
-              <div className="relative w-full aspect-square max-w-md mb-4">
-                <Image 
-                  src={getSafeImageUrl(previewUrl)}
-                  alt="Preview"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <div className="w-full aspect-square max-w-md flex flex-col items-center justify-center bg-gray-100 rounded-lg mb-4">
-                <Camera className="h-16 w-16 text-gray-400 mb-2" />
-                <p className="text-gray-500">No image selected</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
+      <div className="max-w-2xl mx-auto">
         {/* Upload Form */}
         <Card>
           <CardHeader>
@@ -255,42 +177,18 @@ export default function AddImagePage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="file">Image File</Label>
-                <div 
-                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                    isDragging 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  onDragEnter={handleDragEnter}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <p className="text-sm text-gray-600 mb-2">
-                    {isDragging ? 'Drop gambar di sini' : 'Drag and drop gambar, atau klik untuk memilih'}
-                  </p>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    className="mt-2"
-                    onChange={handleFileChange}
-                  />
-                  {previewUrl && (
-                    <div className="mt-4">
-                      <Image
-                        src={previewUrl}
-                        alt="Preview"
-                        width={200}
-                        height={200}
-                        className="mx-auto rounded-lg object-cover"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
+              <MediaUploader
+                label="Image File"
+                acceptImages={true}
+                acceptVideos={false}
+                multiple={false}
+                maxSizeMB={10}
+                value={mediaFiles}
+                onChange={setMediaFiles}
+                showPreview={true}
+                previewSize="lg"
+                helperText="Upload gambar untuk gallery"
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="tags">Tags (optional)</Label>
@@ -315,7 +213,7 @@ export default function AddImagePage() {
                     </>
                   ) : (
                     <>
-                      <Upload className="mr-2 h-4 w-4" />
+                      <Camera className="mr-2 h-4 w-4" />
                       Upload Image
                     </>
                   )}

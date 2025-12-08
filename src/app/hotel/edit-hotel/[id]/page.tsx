@@ -8,7 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Upload, X, Save, Loader2 } from "lucide-react";
+import { MediaUploader, MediaFile } from "@/components/ui/media-uploader";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { getHotel, updateHotel } from "@/lib/api/hotels";
 import { useNotifications } from "@/contexts/NotificationContext";
 
@@ -33,8 +34,7 @@ export default function EditHotelPage({
   const { addNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [existingImages, setExistingImages] = useState<{id: number, image_url: string}[]>([]);
 
   const [formData, setFormData] = useState<FormData>({
@@ -99,60 +99,6 @@ export default function EditHotelPage({
     }));
   };
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    
-    if (files.length === 0) return;
-
-    // Validate file types
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
-    
-    if (invalidFiles.length > 0) {
-      addNotification({
-        type: "error",
-        title: "Invalid file type",
-        message: "Please select only valid image files.",
-      });
-      return;
-    }
-
-    // Validate file sizes (5MB each)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const oversizedFiles = files.filter(file => file.size > maxSize);
-    
-    if (oversizedFiles.length > 0) {
-      addNotification({
-        type: "error",
-        title: "File too large",
-        message: "Each image must be less than 5MB.",
-      });
-      return;
-    }
-
-    // Add to existing images
-    const newImages = [...selectedImages, ...files];
-    setSelectedImages(newImages);
-
-    // Create previews for new files
-    const newPreviews = [...imagePreviews];
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        newPreviews.push(reader.result as string);
-        setImagePreviews([...newPreviews]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleRemoveNewImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    const newPreviews = imagePreviews.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
-    setImagePreviews(newPreviews);
-  };
-
   const handleRemoveExistingImage = (imageId: number) => {
     const updatedExisting = existingImages.filter(img => img.id !== imageId);
     setExistingImages(updatedExisting);
@@ -215,8 +161,8 @@ export default function EditHotelPage({
       });
 
       // Add new images if selected
-      selectedImages.forEach((image) => {
-        submitData.append("images", image);
+      mediaFiles.forEach((media) => {
+        submitData.append("images", media.file);
       });
 
       // Add existing image IDs to keep
@@ -427,7 +373,7 @@ export default function EditHotelPage({
                         onClick={() => handleRemoveExistingImage(image.id)}
                         className="absolute top-2 right-2"
                       >
-                        <X className="h-4 w-4" />
+                        ✕
                       </Button>
                       <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
                         Current
@@ -438,55 +384,17 @@ export default function EditHotelPage({
               </div>
             )}
 
-            {/* New Images */}
-            {imagePreviews.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">New Images</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <Image
-                        src={preview}
-                        alt={`New hotel image ${index + 1}`}
-                        width={300}
-                        height={200}
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemoveNewImage(index)}
-                        className="absolute top-2 right-2"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                      <div className="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                        New
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Upload Area */}
-            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600 mb-2">
-                {existingImages.length > 0 || imagePreviews.length > 0 
-                  ? "Add more images" 
-                  : "Click to upload or drag and drop"}
-              </p>
-              <p className="text-xs text-gray-500">
-                PNG, JPG, GIF up to 5MB each. Select multiple files.
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageSelect}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            {/* New Images Upload */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Add New Images</h3>
+              <MediaUploader
+                label=""
+                acceptImages={true}
+                multiple={true}
+                maxFiles={10}
+                maxSizeMB={5}
+                value={mediaFiles}
+                onChange={setMediaFiles}
               />
             </div>
           </div>

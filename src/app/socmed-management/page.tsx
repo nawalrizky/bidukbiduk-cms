@@ -532,7 +532,7 @@ export default function SocmedManagementPage() {
                 </Button>
               </div>
             )}
-            <Button onClick={handleCreate} className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
+            <Button onClick={handleCreate} size="sm" className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
               <Plus className="h-4 w-4 mr-2" />
               Buat Postingan
             </Button>
@@ -584,18 +584,79 @@ export default function SocmedManagementPage() {
               const isVideo = post.post_type === 'video' || post.post_type === 'reel';
               
               if (isVideo && fullMediaUrl) {
-                // Try to extract thumbnail from extras
                 let thumbnailUrl = null;
-                if (post.extras && typeof post.extras === 'object' && 'last_response' in post.extras) {
+                
+                // 1. Try to get thumbnail from post.thumbnail field (for scheduled posts)
+                if (post.thumbnail) {
+                  if (typeof post.thumbnail === 'string') {
+                    thumbnailUrl = post.thumbnail;
+                  } else if (typeof post.thumbnail === 'object' && 'url' in post.thumbnail) {
+                    thumbnailUrl = post.thumbnail.url;
+                  }
+                  
+                  // Build full URL if it's a relative path
+                  if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+                    thumbnailUrl = `${baseUrl}${thumbnailUrl}`;
+                  }
+                }
+                
+                // 2. Try to get thumbnail from media array (might be second item)
+                if (!thumbnailUrl && Array.isArray(post.media) && post.media.length > 1) {
+                  const thumbnailItem = post.media.find(item => 
+                    item.type === 'image' || 
+                    item.url.includes('thumb') || 
+                    item.url.endsWith('.jpg') || 
+                    item.url.endsWith('.jpeg') || 
+                    item.url.endsWith('.png')
+                  );
+                  if (thumbnailItem) {
+                    thumbnailUrl = thumbnailItem.url;
+                    if (!thumbnailUrl.startsWith('http')) {
+                      thumbnailUrl = `${baseUrl}${thumbnailUrl}`;
+                    }
+                  }
+                }
+                
+                // 3. Try to extract thumbnail from extras (for published posts)
+                if (!thumbnailUrl && post.extras && typeof post.extras === 'object' && 'last_response' in post.extras) {
                   const extras = post.extras as { last_response?: { data?: { thumbnail_url?: string } } };
                   thumbnailUrl = extras.last_response?.data?.thumbnail_url || null;
                 }
                 
-                // If no thumbnail in extras, try pattern matching
+                // 4. Try pattern matching (replace video extension with _thumb.jpg)
                 if (!thumbnailUrl && fullMediaUrl) {
-                  const thumbnailPattern = fullMediaUrl.replace(/\.(mp4|mov|avi|mkv)$/i, '_thumb.jpg');
+                  const thumbnailPattern = fullMediaUrl.replace(/\.(mp4|mov|avi|mkv|webm)$/i, '_thumb.jpg');
                   if (thumbnailPattern !== fullMediaUrl) {
                     thumbnailUrl = thumbnailPattern;
+                  }
+                }
+                
+                // 5. Try alternative pattern (replace video extension with .jpg)
+                if (!thumbnailUrl && fullMediaUrl) {
+                  const thumbnailPattern2 = fullMediaUrl.replace(/\.(mp4|mov|avi|mkv|webm)$/i, '.jpg');
+                  if (thumbnailPattern2 !== fullMediaUrl) {
+                    thumbnailUrl = thumbnailPattern2;
+                  }
+                }
+                
+                // 6. Try pattern with thumbnails directory
+                if (!thumbnailUrl && fullMediaUrl) {
+                  const urlParts = fullMediaUrl.split('/');
+                  const filename = urlParts.pop() || '';
+                  const videoName = filename.replace(/\.(mp4|mov|avi|mkv|webm)$/i, '');
+                  if (videoName !== filename) {
+                    urlParts.push('thumbnails', `${videoName}.jpg`);
+                    thumbnailUrl = urlParts.join('/');
+                  }
+                }
+                
+                // 7. Try pattern with thumbnail prefix
+                if (!thumbnailUrl && fullMediaUrl) {
+                  const urlParts = fullMediaUrl.split('/');
+                  const filename = urlParts.pop() || '';
+                  if (filename) {
+                    urlParts.push(`thumbnail_${filename.replace(/\.(mp4|mov|avi|mkv|webm)$/i, '.jpg')}`);
+                    thumbnailUrl = urlParts.join('/');
                   }
                 }
                 

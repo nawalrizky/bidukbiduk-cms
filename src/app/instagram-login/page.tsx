@@ -121,7 +121,7 @@ export default function InstagramLoginPage() {
             className="mb-6"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Login
+            Kembali ke Login
           </Button>
 
           <Card className="p-8">
@@ -129,22 +129,22 @@ export default function InstagramLoginPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl mb-4">
                 <Mail className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Verification Required</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Verifikasi Diperlukan</h1>
               <p className="text-sm text-gray-600 mt-2">
-                Instagram has sent a verification code to your email
+                Instagram telah mengirim kode verifikasi ke email Anda
               </p>
             </div>
 
             {challengeInfo?.challenge_info && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-blue-800 font-medium mb-2">
-                  📧 Check your email for the verification code
+                  📧 Periksa email Anda untuk kode verifikasi
                 </p>
                 <p className="text-sm text-blue-800">
-                  <strong>Account:</strong> {challengeInfo.challenge_info.username}
+                  <strong>Akun:</strong> {challengeInfo.challenge_info.username}
                 </p>
                 <p className="text-xs text-blue-600 mt-2">
-                  Instagram has sent a verification code to the email associated with this account.
+                  Instagram telah mengirim kode verifikasi ke email yang terhubung dengan akun ini.
                 </p>
               </div>
             )}
@@ -159,20 +159,20 @@ export default function InstagramLoginPage() {
 
             <form onSubmit={handleVerificationSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="code">Verification Code</Label>
+                <Label htmlFor="code">Kode Verifikasi</Label>
                 <Input
                   id="code"
                   type="text"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
-                  placeholder="Enter 6-digit code"
+                  placeholder="Masukkan kode 6 digit"
                   required
                   disabled={loading}
                   className="mt-1 text-center text-2xl tracking-widest font-mono"
                   maxLength={6}
                 />
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  Enter the code sent to your email
+                  Masukkan kode yang dikirim ke email Anda
                 </p>
               </div>
 
@@ -184,12 +184,12 @@ export default function InstagramLoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
+                    Memverifikasi...
                   </>
                 ) : (
                   <>
                     <Shield className="mr-2 h-4 w-4" />
-                    Verify Code
+                    Verifikasi Kode
                   </>
                 )}
               </Button>
@@ -206,27 +206,27 @@ export default function InstagramLoginPage() {
                   {checkingStatus ? (
                     <>
                       <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      Checking status...
+                      Memeriksa status...
                     </>
                   ) : (
-                    'Check Status Manually'
+                    'Periksa Status Secara Manual'
                   )}
                 </Button>
                 <p className="text-xs text-gray-500 mt-2">
-                  Status is automatically checked every 5 seconds
+                  Status diperiksa secara otomatis setiap 5 detik
                 </p>
               </div>
 
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
                 <p className="text-xs text-gray-600 text-center">
-                  💡 <strong>Note:</strong> The login process may take a few moments as Instagram verifies your credentials and sends the verification code.
+                  💡 <strong>Catatan:</strong> Proses login mungkin memakan waktu beberapa saat karena Instagram memverifikasi kredensial Anda dan mengirim kode verifikasi.
                 </p>
               </div>
             </form>
           </Card>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            Didn&apos;t receive the code? Check your spam folder or try logging in again.
+            Tidak menerima kode? Periksa folder spam Anda atau coba masuk lagi.
           </p>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function InstagramLoginPage() {
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          Kembali ke Dashboard
         </Link>
 
         <Card className="p-8">
@@ -249,21 +249,21 @@ export default function InstagramLoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-2xl mb-4">
               <Instagram className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Connect Instagram Account</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Hubungkan Akun Instagram</h1>
             <p className="text-sm text-gray-600 mt-2">
-              Login to your Instagram account to manage posts and view analytics
+              Masuk ke akun Instagram Anda untuk mengelola postingan dan melihat analitik
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="username">Instagram Username</Label>
+              <Label htmlFor="username">Username Instagram</Label>
               <Input
                 id="username"
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="your_username"
+                placeholder="nama_pengguna_anda"
                 required
                 disabled={loading}
                 className="mt-1"
@@ -271,7 +271,7 @@ export default function InstagramLoginPage() {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <Input
                 id="password"
                 type="password"
@@ -292,17 +292,17 @@ export default function InstagramLoginPage() {
               {loginStage === 'logging-in' ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Logging in...
+                  Masuk...
                 </>
               ) : loginStage === 'checking-challenge' ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking verification status...
+                  Memeriksa status verifikasi...
                 </>
               ) : (
                 <>
                   <Instagram className="mr-2 h-4 w-4" />
-                  Connect Instagram
+                  Masuk 
                 </>
               )}
             </Button>
@@ -312,11 +312,11 @@ export default function InstagramLoginPage() {
                 <div className="flex items-center justify-center mb-2">
                   <Loader2 className="h-5 w-5 animate-spin text-blue-600 mr-2" />
                   <p className="text-sm font-medium text-blue-800">
-                    Checking verification status...
+                    Memeriksa status verifikasi...
                   </p>
                 </div>
                 <p className="text-xs text-blue-600 text-center">
-                  We&apos;re checking if Instagram requires email verification for your account
+                  Kami sedang memeriksa apakah Instagram memerlukan verifikasi email untuk akun Anda
                 </p>
               </div>
             )}
@@ -324,20 +324,16 @@ export default function InstagramLoginPage() {
             {loginStage === 'logging-in' && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mt-4">
                 <p className="text-sm text-purple-800 text-center">
-                  📤 Submitting your credentials to Instagram...
+                  📤 Mengirim kredensial Anda ke Instagram...
                 </p>
               </div>
             )}
 
-            <div className="text-xs text-gray-500 text-center mt-4">
-              <p>Your credentials are securely stored and used only for managing your Instagram content.</p>
-            </div>
+            
           </form>
         </Card>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
-          Need help? Contact your administrator.
-        </p>
+      
       </div>
     </div>
   );

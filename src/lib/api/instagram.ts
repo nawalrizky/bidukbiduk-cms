@@ -85,6 +85,7 @@ export interface InstagramPost {
   post_type: string;
   caption: string;
   media: InstagramMediaItem[] | string; // Can be array or string
+  thumbnail?: string | InstagramMediaItem; // Thumbnail URL or media item
   scheduled_at: string | null;
   status: string;
   extras: InstagramExtras | string | null;
@@ -98,6 +99,21 @@ export interface InstagramPostsResponse {
   next: string | null;
   previous: string | null;
   results: InstagramPost[];
+}
+
+export interface InstagramSession {
+  id: number;
+  name: string;
+  instagram_username: string;
+  session: {
+    authorization_data: {
+      ds_user_id: string;
+      sessionid: string;
+    };
+    [key: string]: unknown;
+  };
+  created_at: string;
+  updated_at: string;
 }
 
 export const getInstagramAnalytics = async (params?: {
@@ -192,18 +208,3 @@ export const getInstagramSession = async (): Promise<InstagramSession> => {
 export const deleteInstagramSession = async (): Promise<void> => {
   await api.delete('/instagram/session/');
 };
-
-interface InstagramSession {
-  id: number;
-  name: string;
-  instagram_username: string;
-  session: {
-    authorization_data: {
-      ds_user_id: string;
-      sessionid: string;
-    };
-    [key: string]: unknown;
-  };
-  created_at: string;
-  updated_at: string;
-}

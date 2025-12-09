@@ -273,17 +273,11 @@ export default function SocmedAnalyticsPage() {
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Putuskan
+              Keluar
               </Button>
             </div>
           )}
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Ekspor
-          </Button>
-          <Button variant="outline" size="sm" className="px-3">
-            <ChevronDown className="h-4 w-4" />
-          </Button>
+        
         </div>
       </div>
 

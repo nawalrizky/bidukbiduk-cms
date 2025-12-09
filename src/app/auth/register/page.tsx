@@ -119,7 +119,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Username
+                  Nama Pengguna
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -253,15 +253,15 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? 'Membuat Akun...' : 'Buat Akun'}
               </Button>
             </form>
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Already have an account?{' '}
+                Sudah punya akun?{' '}
                 <Link href="/auth/login" className="text-blue-600 hover:text-blue-800 font-medium">
-                  Sign in
+                  Masuk
                 </Link>
               </p>
             </div>

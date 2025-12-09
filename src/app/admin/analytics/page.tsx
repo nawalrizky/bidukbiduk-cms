@@ -5,28 +5,28 @@ import { BarChart3, TrendingUp, Users, Eye } from 'lucide-react'
 
 const analyticsData = [
   {
-    title: "Page Views",
+    title: "Tayangan Halaman",
     value: "24,567",
     change: "+12.5%",
     trend: "up",
     icon: Eye
   },
   {
-    title: "Unique Visitors",
+    title: "Pengunjung Unik",
     value: "8,293",
     change: "+8.2%",
     trend: "up",
     icon: Users
   },
   {
-    title: "Bounce Rate",
+    title: "Tingkat Pentalan",
     value: "34.2%",
     change: "-2.1%",
     trend: "down",
     icon: TrendingUp
   },
   {
-    title: "Avg. Session",
+    title: "Rata-rata Sesi",
     value: "4m 32s",
     change: "+15.3%",
     trend: "up",
@@ -47,9 +47,9 @@ export default function AnalyticsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Analitik</h2>
           <p className="text-gray-600">
-            Track your content performance and user engagement
+            Lacak performa konten dan keterlibatan pengguna
           </p>
         </div>
         
@@ -67,7 +67,7 @@ export default function AnalyticsPage() {
                 <p className={`text-xs ${
                   metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
                 } mt-1`}>
-                  {metric.change} from last month
+                  {metric.change} dari bulan lalu
                 </p>
               </CardContent>
             </Card>
@@ -77,17 +77,17 @@ export default function AnalyticsPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Traffic Overview</CardTitle>
+              <CardTitle>Ringkasan Lalu Lintas</CardTitle>
               <CardDescription>
-                Website traffic for the last 30 days
+                Lalu lintas website selama 30 hari terakhir
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                 <div className="text-center">
                   <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Chart visualization would go here</p>
-                  <p className="text-sm text-gray-400">Integration with chart library needed</p>
+                  <p className="text-gray-500">Visualisasi grafik akan ditampilkan di sini</p>
+                  <p className="text-sm text-gray-400">Integrasi dengan library grafik diperlukan</p>
                 </div>
               </div>
             </CardContent>
@@ -95,9 +95,9 @@ export default function AnalyticsPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Top Performing Content</CardTitle>
+              <CardTitle>Konten Berkinerja Terbaik</CardTitle>
               <CardDescription>
-                Most viewed articles this month
+                Artikel yang paling banyak dilihat bulan ini
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -110,8 +110,8 @@ export default function AnalyticsPage() {
                     <div className="flex-1">
                       <p className="text-sm font-medium">{content.title}</p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span>{content.views.toLocaleString()} views</span>
-                        <span>{content.engagement} engagement</span>
+                        <span>{content.views.toLocaleString()} tayangan</span>
+                        <span>{content.engagement} keterlibatan</span>
                       </div>
                     </div>
                   </div>
@@ -124,12 +124,12 @@ export default function AnalyticsPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Traffic Sources</CardTitle>
+              <CardTitle className="text-lg">Sumber Lalu Lintas</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Organic Search</span>
+                  <span className="text-sm">Pencarian Organik</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-16 h-2 bg-gray-200 rounded-full">
                       <div className="w-12 h-2 bg-blue-600 rounded-full"></div>
@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Direct</span>
+                  <span className="text-sm">Langsung</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-16 h-2 bg-gray-200 rounded-full">
                       <div className="w-8 h-2 bg-green-600 rounded-full"></div>
@@ -147,7 +147,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Social Media</span>
+                  <span className="text-sm">Media Sosial</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-16 h-2 bg-gray-200 rounded-full">
                       <div className="w-6 h-2 bg-purple-600 rounded-full"></div>
@@ -161,24 +161,24 @@ export default function AnalyticsPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">User Demographics</CardTitle>
+              <CardTitle className="text-lg">Demografi Pengguna</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Age 18-24</span>
+                  <span className="text-sm text-gray-600">Usia 18-24</span>
                   <span className="text-sm font-medium">22%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Age 25-34</span>
+                  <span className="text-sm text-gray-600">Usia 25-34</span>
                   <span className="text-sm font-medium">35%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Age 35-44</span>
+                  <span className="text-sm text-gray-600">Usia 35-44</span>
                   <span className="text-sm font-medium">28%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Age 45+</span>
+                  <span className="text-sm text-gray-600">Usia 45+</span>
                   <span className="text-sm font-medium">15%</span>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Device Usage</CardTitle>
+              <CardTitle className="text-lg">Penggunaan Perangkat</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

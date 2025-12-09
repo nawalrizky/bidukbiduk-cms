@@ -47,8 +47,8 @@ export default function HotelPage() {
       console.error('Error loading hotels:', error)
       addNotification({
         type: 'error',
-        title: 'Failed to load hotels',
-        message: 'Unable to load hotels. Please try again.'
+        title: 'Gagal memuat amenitas',
+        message: 'Tidak dapat memuat amenitas. Silakan coba lagi.'
       })
       // Set empty array on error
       setHotels([])
@@ -74,8 +74,8 @@ export default function HotelPage() {
       
       addNotification({
         type: 'success',
-        title: 'Hotel deactivated',
-        message: `Hotel "${deleteModal.itemToDelete.name}" has been deactivated successfully`
+        title: 'Amenitas dinonaktifkan',
+        message: `Amenitas "${deleteModal.itemToDelete.name}" telah berhasil dinonaktifkan`
       })
       
       // Close modal and reload hotels list
@@ -86,7 +86,7 @@ export default function HotelPage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
       addNotification({
         type: 'error',
-        title: 'Failed to deactivate hotel',
+        title: 'Gagal menonaktifkan amenitas',
         message: errorMessage
       })
     } finally {
@@ -109,14 +109,14 @@ export default function HotelPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Hotels</h1>
-            <p className="text-gray-600">Manage hotel listings and bookings</p>
+            <h1 className="text-3xl font-bold tracking-tight">Amenitas</h1>
+            <p className="text-gray-600">Kelola listing amenitas (restoran, cafe, dll)</p>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading hotels...</p>
+            <p className="text-gray-600">Memuat amenitas...</p>
           </div>
         </div>
       </div>
@@ -127,14 +127,14 @@ export default function HotelPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Hotels</h1>
-          <p className="text-gray-600">Manage hotel listings and bookings</p>
+          <h1 className="text-3xl font-bold tracking-tight">Amenitas</h1>
+          <p className="text-gray-600">Kelola listing amenitas (restoran, cafe, dll)</p>
         </div>
         <div className="flex space-x-2">
           <Link href="/hotel/add-hotel">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add New Hotel
+              Tambah Amenitas Baru
             </Button>
           </Link>
         </div>
@@ -147,7 +147,7 @@ export default function HotelPage() {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search hotels..."
+                placeholder="Cari amenitas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -164,18 +164,18 @@ export default function HotelPage() {
           <div className="flex flex-col items-center justify-center py-12">
             <Building className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchTerm ? 'No hotels found' : 'No hotels yet'}
+              {searchTerm ? 'Tidak ada amenitas ditemukan' : 'Belum ada amenitas'}
             </h3>
             <p className="text-gray-600 mb-4">
               {searchTerm 
-                ? 'Try adjusting your search criteria.' 
-                : 'Get started by creating your first hotel listing.'}
+                ? 'Coba sesuaikan kriteria pencarian Anda.' 
+                : 'Mulai dengan membuat listing amenitas pertama Anda.'}
             </p>
             {!searchTerm && (
               <Link href="/hotel/add-hotel">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create First Hotel
+                  Buat Amenitas Pertama
                 </Button>
               </Link>
             )}
@@ -220,12 +220,12 @@ export default function HotelPage() {
                         ? "bg-green-100 text-green-800" 
                         : "bg-gray-100 text-gray-800"
                     }`}>
-                      {hotel.is_active ? "Active" : "Inactive"}
+                      {hotel.is_active ? "Aktif" : "Tidak Aktif"}
                     </span>
                   </div>
                   {hotel.images && hotel.images.length > 1 && (
                     <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                      +{hotel.images.length - 1} more
+                      +{hotel.images.length - 1} lagi
                     </div>
                   )}
                 </div>
@@ -242,7 +242,7 @@ export default function HotelPage() {
                     </Link>
                     <p className="text-2xl font-bold text-green-600">
                       Rp {parseFloat(hotel.price).toLocaleString('id-ID')}
-                      <span className="text-sm text-gray-500 font-normal">/night</span>
+                      <span className="text-sm text-gray-500 font-normal">/malam</span>
                     </p>
                   </div>
 
@@ -252,10 +252,10 @@ export default function HotelPage() {
                     <span className="text-sm text-gray-600">
                       {hotel.total_rating_users > 0 ? (
                         <>
-                          {hotel.total_rating.toFixed(1)} ({hotel.total_rating_users} reviews)
+                          {hotel.total_rating.toFixed(1)} ({hotel.total_rating_users} ulasan)
                         </>
                       ) : (
-                        'No reviews yet'
+                        'Belum ada ulasan'
                       )}
                     </span>
                   </div>
@@ -297,9 +297,9 @@ export default function HotelPage() {
         onClose={deleteModal.closeModal}
         onConfirm={confirmDelete}
         itemName={deleteModal.itemToDelete?.name || ''}
-        itemType="Hotel"
-        title="Deactivate Hotel"
-        customMessage={`Are you sure you want to deactivate "${deleteModal.itemToDelete?.name}"? The hotel will be hidden from the listing but can be reactivated later.`}
+        itemType="Amenitas"
+        title="Nonaktifkan Amenitas"
+        customMessage={`Apakah Anda yakin ingin menonaktifkan "${deleteModal.itemToDelete?.name}"? Amenitas akan disembunyikan dari listing tetapi dapat diaktifkan kembali nanti.`}
         isDeleting={deleteLoading !== null}
       />
     </div>

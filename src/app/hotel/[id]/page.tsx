@@ -37,8 +37,8 @@ export default function HotelDetailPage({
         console.error("Error loading hotel:", error);
         addNotification({
           type: "error",
-          title: "Failed to load hotel",
-          message: "Unable to load hotel details. Please try again.",
+          title: "Gagal memuat amenitas",
+          message: "Tidak dapat memuat detail amenitas. Silakan coba lagi.",
         });
       } finally {
         setLoading(false);
@@ -63,8 +63,8 @@ export default function HotelDetailPage({
       
       addNotification({
         type: "success",
-        title: "Hotel deleted",
-        message: `Hotel "${hotel.name}" has been deleted successfully`,
+        title: "Amenitas dihapus",
+        message: `Amenitas "${hotel.name}" telah berhasil dihapus`,
       });
 
       router.push("/hotel");
@@ -73,7 +73,7 @@ export default function HotelDetailPage({
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       addNotification({
         type: "error",
-        title: "Failed to delete hotel",
+        title: "Gagal menghapus amenitas",
         message: errorMessage,
       });
     } finally {
@@ -91,14 +91,14 @@ export default function HotelDetailPage({
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Hotel Details</h1>
-            <p className="text-gray-600">View hotel information</p>
+            <h1 className="text-3xl font-bold tracking-tight">Detail Amenitas</h1>
+            <p className="text-gray-600">Lihat informasi amenitas</p>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading hotel details...</p>
+            <p className="text-gray-600">Memuat detail amenitas...</p>
           </div>
         </div>
       </div>
@@ -118,19 +118,19 @@ export default function HotelDetailPage({
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Hotel Not Found</h1>
-            <p className="text-gray-600">The hotel you&apos;re looking for doesn&apos;t exist</p>
+            <h1 className="text-3xl font-bold tracking-tight">Amenitas Tidak Ditemukan</h1>
+            <p className="text-gray-600">Amenitas yang Anda cari tidak ada</p>
           </div>
         </div>
         <Card className="p-8">
           <div className="text-center">
             <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Hotel Not Found</h3>
-            <p className="text-gray-600 mb-4">The hotel you&apos;re looking for may have been deleted or doesn&apos;t exist.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Amenitas Tidak Ditemukan</h3>
+            <p className="text-gray-600 mb-4">Amenitas yang Anda cari mungkin telah dihapus atau tidak ada.</p>
             <Link href="/hotel">
               <Button>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Hotels
+                Kembali ke Amenitas
               </Button>
             </Link>
           </div>
@@ -149,11 +149,11 @@ export default function HotelDetailPage({
             onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Kembali
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{hotel.name}</h1>
-            <p className="text-gray-600">Hotel Details</p>
+            <p className="text-gray-600">Detail Amenitas</p>
           </div>
         </div>
         
@@ -170,7 +170,7 @@ export default function HotelDetailPage({
             disabled={deleting}
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            Hapus
           </Button>
         </div>
       </div>
@@ -193,22 +193,22 @@ export default function HotelDetailPage({
 
           {/* Hotel Information */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Hotel Information</h2>
+            <h2 className="text-xl font-semibold mb-4">Informasi Amenitas</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-bold text-sm  text-gray-700">Name</h3>
+                <h3 className="font-bold text-sm  text-gray-700">Nama</h3>
                 <p className="text-lg">{hotel.name}</p>
               </div>
 
               {hotel.description && (
                 <div>
-                  <h3 className="font-bold text-sm  text-gray-700">Description</h3>
+                  <h3 className="font-bold text-sm  text-gray-700">Deskripsi</h3>
                   <p className="text-gray-900 whitespace-pre-wrap">{hotel.description}</p>
                 </div>
               )}
               
               <div>
-                <h3 className="font-bold text-sm  text-gray-700">Price per Night</h3>
+                <h3 className="font-bold text-sm  text-gray-700">Harga per Malam</h3>
                 <p className="text-2xl font-bold text-green-600">
                   Rp {parseFloat(hotel.price).toLocaleString('id-ID')}
                 </p>
@@ -224,7 +224,7 @@ export default function HotelDetailPage({
                       <span className="text-gray-500">/ 5.0</span>
                     </div>
                     <span className="text-sm text-gray-500">
-                      ({hotel.total_rating_users} {hotel.total_rating_users === 1 ? 'review' : 'reviews'})
+                      ({hotel.total_rating_users} {hotel.total_rating_users === 1 ? 'ulasan' : 'ulasan'})
                     </span>
                   </div>
                   {/* Star Rating Visualization */}
@@ -245,14 +245,14 @@ export default function HotelDetailPage({
 
               {hotel.book_url && (
                 <div>
-                  <h3 className="font-bold text-sm  text-gray-700">Booking</h3>
+                  <h3 className="font-bold text-sm  text-gray-700">Pemesanan</h3>
                   <a 
                     href={hotel.book_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-blue-600 hover:text-blue-800 underline"
                   >
-                    Book this hotel
+                    Pesan amenitas ini
                     <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </a>
                 </div>
@@ -260,14 +260,14 @@ export default function HotelDetailPage({
 
               {hotel.maps_url && (
                 <div>
-                  <h3 className="font-bold text-sm  text-gray-700">Location</h3>
+                  <h3 className="font-bold text-sm  text-gray-700">Lokasi</h3>
                   <a 
                     href={hotel.maps_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="inline-flex items-center text-blue-600 hover:text-blue-800 underline"
                   >
-                    View on Maps
+                    Lihat di Peta
                     <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </a>
                 </div>
@@ -282,12 +282,12 @@ export default function HotelDetailPage({
                       : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {hotel.is_active ? 'Active' : 'Inactive'}
+                  {hotel.is_active ? 'Aktif' : 'Tidak Aktif'}
                 </span>
               </div>
 
               <div>
-                <h3 className="font-bold text-sm  text-gray-700">Created</h3>
+                <h3 className="font-bold text-sm  text-gray-700">Dibuat</h3>
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-gray-400" />
                   <span>{new Date(hotel.created_at).toLocaleDateString('id-ID', {
@@ -312,7 +312,7 @@ export default function HotelDetailPage({
         onClose={deleteModal.closeModal}
         onConfirm={handleDelete}
         itemName={deleteModal.itemToDelete?.name || ''}
-        itemType="Hotel"
+        itemType="Amenitas"
         isDeleting={deleting}
       />
     </div>

@@ -81,8 +81,8 @@ export default function EditHotelPage({
         console.error("Error loading data:", error);
         addNotification({
           type: "error",
-          title: "Failed to load hotel",
-          message: "Unable to load hotel data. Please try again.",
+          title: "Gagal memuat amenitas",
+          message: "Tidak dapat memuat data amenitas. Silakan coba lagi.",
         });
       } finally {
         setPageLoading(false);
@@ -111,7 +111,7 @@ export default function EditHotelPage({
       addNotification({
         type: "error",
         title: "Validation Error",
-        message: "Hotel name is required.",
+        message: "Nama amenitas wajib diisi.",
       });
       return;
     }
@@ -120,7 +120,7 @@ export default function EditHotelPage({
       addNotification({
         type: "error",
         title: "Validation Error",
-        message: "Hotel description is required.",
+        message: "Deskripsi amenitas wajib diisi.",
       });
       return;
     }
@@ -129,7 +129,7 @@ export default function EditHotelPage({
       addNotification({
         type: "error",
         title: "Validation Error",
-        message: "Please enter a valid price.",
+        message: "Silakan masukkan harga yang valid.",
       });
       return;
     }
@@ -183,8 +183,8 @@ export default function EditHotelPage({
 
       addNotification({
         type: "success",
-        title: "Hotel updated",
-        message: `Hotel "${formData.name}" has been updated successfully`,
+        title: "Amenitas diperbarui",
+        message: `Amenitas "${formData.name}" telah berhasil diperbarui`,
       });
 
       router.push("/hotel");
@@ -193,7 +193,7 @@ export default function EditHotelPage({
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       addNotification({
         type: "error",
-        title: "Failed to update hotel",
+        title: "Gagal memperbarui amenitas",
         message: errorMessage,
       });
     } finally {
@@ -210,14 +210,14 @@ export default function EditHotelPage({
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Edit Hotel</h1>
-            <p className="text-gray-600">Update hotel information</p>
+            <h1 className="text-3xl font-bold tracking-tight">Edit Amenitas</h1>
+            <p className="text-gray-600">Perbarui informasi amenitas</p>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading hotel data...</p>
+            <p className="text-gray-600">Memuat data amenitas...</p>
           </div>
         </div>
       </div>
@@ -236,41 +236,41 @@ export default function EditHotelPage({
           Back
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Hotel</h1>
-          <p className="text-gray-600">Update hotel information</p>
+          <h1 className="text-3xl font-bold tracking-tight">Edit Amenitas</h1>
+          <p className="text-gray-600">Perbarui informasi amenitas</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          <h2 className="text-xl font-semibold mb-4">Informasi Dasar</h2>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Hotel Name *</Label>
+              <Label htmlFor="name">Nama Amenitas *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                placeholder="Enter hotel name"
+                placeholder="Masukkan nama amenitas (contoh: Restoran, Cafe, dll)"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">Deskripsi *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
-                placeholder="Enter hotel description"
+                placeholder="Masukkan deskripsi amenitas"
                 className="min-h-[100px]"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="price">Price (IDR) per night *</Label>
+              <Label htmlFor="price">Harga (IDR) per malam *</Label>
               <Input
                 id="price"
                 type="number"
@@ -278,13 +278,13 @@ export default function EditHotelPage({
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
-                placeholder="Enter price in IDR"
+                placeholder="Masukkan harga dalam IDR"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="book_url">Booking URL</Label>
+              <Label htmlFor="book_url">URL Pemesanan</Label>
               <Input
                 id="book_url"
                 type="url"
@@ -295,7 +295,7 @@ export default function EditHotelPage({
             </div>
 
             <div>
-              <Label htmlFor="maps_url">Maps URL</Label>
+              <Label htmlFor="maps_url">URL Peta</Label>
               <Input
                 id="maps_url"
                 type="url"
@@ -307,7 +307,7 @@ export default function EditHotelPage({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="total_rating">Average Rating</Label>
+                <Label htmlFor="total_rating">Rating Rata-rata</Label>
                 <Input
                   id="total_rating"
                   type="number"
@@ -318,11 +318,11 @@ export default function EditHotelPage({
                   onChange={(e) => handleInputChange("total_rating", e.target.value)}
                   placeholder="0.0 - 5.0"
                 />
-                <p className="text-xs text-gray-500 mt-1">Rating from 0.0 to 5.0</p>
+                <p className="text-xs text-gray-500 mt-1">Rating dari 0.0 hingga 5.0</p>
               </div>
 
               <div>
-                <Label htmlFor="total_rating_users">Total Reviews</Label>
+                <Label htmlFor="total_rating_users">Total Ulasan</Label>
                 <Input
                   id="total_rating_users"
                   type="number"
@@ -331,7 +331,7 @@ export default function EditHotelPage({
                   onChange={(e) => handleInputChange("total_rating_users", e.target.value)}
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-500 mt-1">Number of reviews</p>
+                <p className="text-xs text-gray-500 mt-1">Jumlah ulasan</p>
               </div>
             </div>
 
@@ -343,25 +343,25 @@ export default function EditHotelPage({
                 onChange={(e) => handleInputChange("is_active", e.target.checked)}
                 className="rounded"
               />
-              <Label htmlFor="is_active">Active (visible to public)</Label>
+              <Label htmlFor="is_active">Aktif (terlihat untuk publik)</Label>
             </div>
           </div>
         </Card>
 
         {/* Hotel Images */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Hotel Images</h2>
+          <h2 className="text-xl font-semibold mb-4">Gambar Amenitas</h2>
           <div className="space-y-4">
             {/* Existing Images */}
             {existingImages.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Current Images</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Gambar Saat Ini</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                   {existingImages.map((image, index) => (
                     <div key={image.id} className="relative">
                       <Image
                         src={image.image_url}
-                        alt={`Hotel image ${index + 1}`}
+                        alt={`Gambar amenitas ${index + 1}`}
                         width={300}
                         height={200}
                         className="w-full h-40 object-cover rounded-lg"
@@ -376,7 +376,7 @@ export default function EditHotelPage({
                         ✕
                       </Button>
                       <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                        Current
+                        Saat Ini
                       </div>
                     </div>
                   ))}
@@ -386,7 +386,7 @@ export default function EditHotelPage({
 
             {/* New Images Upload */}
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Add New Images</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Tambah Gambar Baru</h3>
               <MediaUploader
                 label=""
                 acceptImages={true}
@@ -408,18 +408,18 @@ export default function EditHotelPage({
             onClick={() => router.back()}
             disabled={loading}
           >
-            Cancel
+            Batal
           </Button>
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
+                Memperbarui...
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Update Hotel
+                Perbarui Amenitas
               </>
             )}
           </Button>

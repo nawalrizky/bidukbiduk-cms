@@ -16,7 +16,7 @@ const MapPicker = dynamic(() => import("../destination/add-destination/MapPicker
   ssr: false,
   loading: () => (
     <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-      Loading map...
+      Memuat peta...
     </div>
   ),
 });
@@ -98,8 +98,8 @@ export default function GISPage() {
     if (!coords) {
       addNotification({
         type: 'error',
-        title: 'Invalid Coordinates',
-        message: 'Please enter valid coordinates in the format: latitude, longitude'
+        title: 'Koordinat Tidak Valid',
+        message: 'Silakan masukkan koordinat yang valid dalam format: lintang, bujur'
       });
       return;
     }
@@ -122,8 +122,8 @@ export default function GISPage() {
 
       addNotification({
         type: 'success',
-        title: 'Coordinates Updated',
-        message: `Coordinates for "${editingDestination.name}" have been updated successfully`
+        title: 'Koordinat Diperbarui',
+        message: `Koordinat untuk "${editingDestination.name}" telah berhasil diperbarui`
       });
 
       // Close modal
@@ -134,8 +134,8 @@ export default function GISPage() {
       console.error('Error updating coordinates:', error);
       addNotification({
         type: 'error',
-        title: 'Update Failed',
-        message: 'Failed to update coordinates. Please try again.'
+        title: 'Pembaruan Gagal',
+        message: 'Gagal memperbarui koordinat. Silakan coba lagi.'
       });
     } finally {
       setSaving(false);
@@ -153,13 +153,13 @@ export default function GISPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">GIS Management</h1>
-          <p className="text-gray-600 mt-2">Geographic Information System - Destination Mapping</p>
+          <h1 className="text-3xl font-bold text-gray-900">Manajemen GIS</h1>
+          <p className="text-gray-600 mt-2">Sistem Informasi Geografis - Pemetaan Destinasi</p>
         </div>
         
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="ml-2">Loading destinations...</span>
+          <span className="ml-2">Memuat destinasi...</span>
         </div>
       </div>
     );
@@ -178,8 +178,8 @@ export default function GISPage() {
         {destinations.length === 0 ? (
           <Card className="p-8 text-center">
             <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Destinations Found</h3>
-            <p className="text-gray-500">No destination data available for mapping.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak Ada Destinasi Ditemukan</h3>
+            <p className="text-gray-500">Tidak ada data destinasi tersedia untuk pemetaan.</p>
           </Card>
         ) : (
           destinations.map((destination) => {
@@ -200,7 +200,7 @@ export default function GISPage() {
                     
                     {coordinates && (
                       <div className="text-sm text-gray-500">
-                        <span className="font-medium">Coordinates:</span>{" "}
+                        <span className="font-medium">Koordinat:</span>{" "}
                         {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
                       </div>
                     )}
@@ -213,7 +213,7 @@ export default function GISPage() {
                         className="flex items-center gap-2 "
                       >
                         <Edit className="h-4 w-4" />
-                        Edit Coordinates
+                        Edit Koordinat
                       </Button>
                     </div>
                   </div>
@@ -232,7 +232,7 @@ export default function GISPage() {
                       <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                         <div className="text-center text-gray-500">
                           <MapPin className="h-8 w-8 mx-auto mb-2" />
-                          <p className="text-sm">No coordinates available</p>
+                          <p className="text-sm">Tidak ada koordinat tersedia</p>
                         </div>
                       </div>
                     )}
@@ -250,7 +250,7 @@ export default function GISPage() {
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-xl font-semibold text-gray-900 ">
-                Edit Coordinates
+                Edit Koordinat
               </h2>
               <Button
                 variant="ghost"
@@ -272,17 +272,17 @@ export default function GISPage() {
                   
                   <div>
                     <Label htmlFor="coordinates">
-                      Coordinates (Latitude, Longitude) *
+                      Koordinat (Lintang, Bujur) *
                     </Label>
                     <Input
                       id="coordinates"
                       value={editCoordinates}
                       onChange={(e) => setEditCoordinates(e.target.value)}
-                      placeholder="e.g., -8.4095, 115.1889"
+                      placeholder="contoh: -8.4095, 115.1889"
                       className="mt-1"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Enter coordinates in decimal degrees format
+                      Masukkan koordinat dalam format derajat desimal
                     </p>
                   </div>
                 </>
@@ -295,7 +295,7 @@ export default function GISPage() {
                 onClick={handleModalClose}
                 disabled={saving}
               >
-                Cancel
+                Batal
               </Button>
               <Button
                 onClick={handleSaveCoordinates}
@@ -305,12 +305,12 @@ export default function GISPage() {
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
+                    Menyimpan...
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-                    Save Coordinates
+                    Simpan Koordinat
                   </>
                 )}
               </Button>

@@ -27,8 +27,8 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
 }) => {
   if (!isOpen) return null
 
-  const defaultTitle = `Delete ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`
-  const defaultMessage = `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
+  const defaultTitle = `Hapus ${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`
+  const defaultMessage = `Apakah Anda yakin ingin menghapus "${itemName}"? Tindakan ini tidak dapat dibatalkan.`
   
   return (
     <div 
@@ -51,7 +51,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             onClick={onClose}
             disabled={isDeleting}
           >
-            Cancel
+            Batal
           </Button>
           <Button 
             variant="destructive" 
@@ -61,12 +61,12 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             {isDeleting ? (
               <>
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent"></div>
-                Deleting...
+                Menghapus...
               </>
             ) : (
               <>
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                Hapus
               </>
             )}
           </Button>

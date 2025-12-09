@@ -50,6 +50,7 @@ export interface CreateInstagramPost {
   post_type: string;
   caption: string;
   media: File;
+  thumbnail?: File;
   scheduled_at?: string;
   status: string;
   extras?: string;
@@ -123,6 +124,10 @@ export const createInstagramPost = async (data: CreateInstagramPost) => {
   formData.append('status', data.status);
   formData.append('session', data.session.toString());
   
+  if (data.thumbnail) {
+    formData.append('thumbnail', data.thumbnail);
+  }
+  
   if (data.scheduled_at) {
     formData.append('scheduled_at', data.scheduled_at);
   }
@@ -159,6 +164,7 @@ export const updateInstagramPost = async (id: number, data: Partial<CreateInstag
   if (data.post_type) formData.append('post_type', data.post_type);
   if (data.caption) formData.append('caption', data.caption);
   if (data.media) formData.append('media', data.media);
+  if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
   if (data.status) formData.append('status', data.status);
   if (data.session !== undefined) formData.append('session', data.session.toString());
   if (data.scheduled_at) formData.append('scheduled_at', data.scheduled_at);

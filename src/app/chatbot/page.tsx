@@ -41,7 +41,7 @@ export default function ChatbotPage() {
       setChatbotContent(content)
       setEditContentValue(content.content)
     } catch (err) {
-      setContentError('Failed to load chatbot content')
+      setContentError('Gagal memuat konten chatbot')
       console.error('Error loading chatbot content:', err)
     } finally {
       setContentLoading(false)
@@ -81,7 +81,7 @@ export default function ChatbotPage() {
       setChatbotContent(updatedContent)
       setIsEditingContent(false)
     } catch (err) {
-      setContentError('Failed to update chatbot content')
+      setContentError('Gagal memperbarui konten chatbot')
       console.error('Error updating chatbot content:', err)
     } finally {
       setContentLoading(false)
@@ -127,13 +127,13 @@ export default function ChatbotPage() {
         return newMessages
       })
     } catch (err) {
-      setError('Failed to send message')
+      setError('Gagal mengirim pesan')
       console.error('Error sending message:', err)
       
       // Log the error reply message
       console.log('Chatbot error reply:', {
         userMessage: inputMessage,
-        botResponse: 'Sorry, I encountered an error. Please try again.',
+        botResponse: 'Maaf, terjadi kesalahan. Silakan coba lagi.',
         timestamp: new Date().toISOString(),
         error: err
       })
@@ -141,7 +141,7 @@ export default function ChatbotPage() {
       // Add error message to chat
       const errorMessage: ChatbotMessage = {
         userMessage: inputMessage,
-        botResponse: 'Sorry, I encountered an error. Please try again.',
+        botResponse: 'Maaf, terjadi kesalahan. Silakan coba lagi.',
         timestamp: new Date().toISOString()
       }
 
@@ -166,12 +166,12 @@ export default function ChatbotPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Chatbot</h1>
           <p className="text-gray-600">
-            Chat with our AI assistant
+            Chat dengan asisten AI kami
           </p>
         </div>
         {messages.length > 0 && (
           <Button variant="outline" onClick={clearChat}>
-            Clear Chat
+            Hapus Chat
           </Button>
         )}
       </div>
@@ -180,7 +180,7 @@ export default function ChatbotPage() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Bot className="h-5 w-5 text-blue-600" />
-            <span>AI Assistant</span>
+            <span>Asisten AI</span>
           </CardTitle>
         </CardHeader>
         
@@ -188,7 +188,7 @@ export default function ChatbotPage() {
           {/* Data Input Section */}
           <div className="mb-6">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold">Data Input</h3>
+              <h3 className="text-lg font-semibold">Input Data</h3>
               <div className="flex space-x-2">
                 {isEditingContent ? (
                   <>
@@ -198,7 +198,7 @@ export default function ChatbotPage() {
                       disabled={contentLoading}
                     >
                       <Check className="h-4 w-4 mr-1" />
-                      {contentLoading ? 'Saving...' : 'Save'}
+                      {contentLoading ? 'Menyimpan...' : 'Simpan'}
                     </Button>
                     <Button 
                       size="sm" 
@@ -207,7 +207,7 @@ export default function ChatbotPage() {
                       disabled={contentLoading}
                     >
                       <X className="h-4 w-4 mr-1" />
-                      Cancel
+                      Batal
                     </Button>
                   </>
                 ) : (
@@ -234,7 +234,7 @@ export default function ChatbotPage() {
               {contentLoading ? (
                 <div className="flex items-center justify-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                  <span className="ml-2 text-gray-600">Loading content...</span>
+                  <span className="ml-2 text-gray-600">Memuat konten...</span>
                 </div>
               ) : isEditingContent ? (
                 <div className="space-y-2">
@@ -242,10 +242,10 @@ export default function ChatbotPage() {
                     value={editContentValue}
                     onChange={(e) => setEditContentValue(e.target.value)}
                     className="w-full h-32 p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter chatbot training content..."
+                    placeholder="Masukkan konten pelatihan chatbot..."
                   />
                   <div className="text-xs text-gray-500 text-right">
-                    {editContentValue.length} characters
+                    {editContentValue.length} karakter
                   </div>
                 </div>
               ) : (
@@ -254,11 +254,11 @@ export default function ChatbotPage() {
                     className="min-h-[8rem] p-2 text-gray-700 whitespace-pre-wrap cursor-pointer hover:bg-gray-100 rounded"
                     onClick={handleEditContent}
                   >
-                    {chatbotContent?.content ? getTrimmedContent(chatbotContent.content) : 'Click to add chatbot training content...'}
+                    {chatbotContent?.content ? getTrimmedContent(chatbotContent.content) : 'Klik untuk menambahkan konten pelatihan chatbot...'}
                   </div>
                   {chatbotContent?.content && isContentTrimmed(chatbotContent.content) && (
                     <div className="text-xs text-gray-500 text-right">
-                      Click Edit to view full content.
+                      Klik Edit untuk melihat konten lengkap.
                     </div>
                   )}
                 </div>
@@ -272,10 +272,10 @@ export default function ChatbotPage() {
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <Bot className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Start a conversation
+                  Mulai percakapan
                 </h3>
                 <p className="text-gray-600">
-                  Ask me anything about traditional boats, fishing, or marine topics!
+                  Tanyakan apa saja tentang perahu tradisional, memancing, atau topik kelautan!
                 </p>
               </div>
             ) : (
@@ -338,7 +338,7 @@ export default function ChatbotPage() {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type your message..."
+              placeholder="Ketik pesan Anda..."
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             />

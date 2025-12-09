@@ -33,27 +33,27 @@ const navigation = [
     icon: FileText,
   },
   {
-    name: 'Socmed Analytics',
+    name: 'Analitik Media Sosial',
     href: '/socmed-analytics',
     icon: BarChart3,
   },
   {
-    name: 'Socmed Management',
+    name: 'Manajemen Media Sosial',
     href: '/socmed-management',
     icon: Upload,
   },
   {
-    name: 'Website Analytics',
+    name: 'Analitik Website',
     href: '/website-analytics',
     icon: Globe,
   },
   {
-    name: 'Destination',
+    name: 'Destinasi',
     href: '/destination',
     icon: MapPin,
   },
   {
-    name: 'Hotel',
+    name: 'Amenitas',
     href: '/hotel',
     icon: Building,
   },
@@ -105,7 +105,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100">
-          <Link href='/' className="text-xl font-semibold text-black">CMS Dashboard</Link>
+          <Link href='/' className="text-xl font-semibold text-black">Dashboard CMS</Link>
           <Button
             variant="ghost"
             size="icon"

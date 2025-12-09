@@ -12,9 +12,9 @@ export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
           <p className="text-lg text-gray-600 mb-8">{description}</p>
         )}
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-yellow-800 mb-2">Coming Soon</h2>
+          <h2 className="text-2xl font-semibold text-yellow-800 mb-2">Segera Hadir</h2>
           <p className="text-yellow-700">
-            This feature is currently under development and will be available soon.
+            Fitur ini sedang dalam pengembangan dan akan segera tersedia.
           </p>
         </div>
       </div>

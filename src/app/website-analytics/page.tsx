@@ -11,9 +11,9 @@ export default function WebsiteAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Website Analytics</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Analitik Website</h1>
           <p className="text-gray-600 mt-2">
-            Monitor your website traffic and performance metrics
+            Pantau lalu lintas website dan metrik performa Anda
           </p>
         </div>
         <div className="flex items-center space-x-4">
@@ -28,7 +28,7 @@ export default function WebsiteAnalyticsPage() {
             }
           >
             <ExternalLink className="h-4 w-4 mr-2" />
-            Open Full Dashboard
+            Buka Dashboard Lengkap
           </Button>
         </div>
       </div>
@@ -40,10 +40,10 @@ export default function WebsiteAnalyticsPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <BarChart3 className="h-5 w-5 mr-2" />
-            Analytics Dashboard
+            Dashboard Analitik
           </CardTitle>
           <CardDescription>
-            Embedded Umami dashboard with real-time data
+            Dashboard Umami tersemat dengan data real-time
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -51,7 +51,7 @@ export default function WebsiteAnalyticsPage() {
             <iframe
               src="https://umami-sigma-ashen.vercel.app/share/ESmSmo71hEkshpMt/bidukbiduk.com"
               className="w-full h-full border-0 rounded-b-lg"
-              title="Umami Analytics Dashboard"
+              title="Dashboard Analitik "
               loading="lazy"
               sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
               referrerPolicy="strict-origin-when-cross-origin"

@@ -53,7 +53,7 @@ export default function GalleryPage() {
       setError(null)
     } catch (err) {
       // For development/testing, show a fallback error with suggestion
-      setError('Failed to load gallery items. The API might not be available.')
+      setError('Gagal memuat item galeri. API mungkin tidak tersedia.')
       console.error('Error loading gallery items:', err)
       setGalleryItems([]) // Ensure it's always an array
       
@@ -89,7 +89,7 @@ export default function GalleryPage() {
       setGalleryItems(items => items.filter(item => item.id !== deleteModal.itemToDelete!.id))
       deleteModal.closeModal()
     } catch (err) {
-      setError('Failed to delete item')
+      setError('Gagal menghapus item')
       console.error('Error deleting item:', err)
     } finally {
       setDeleting(false)
@@ -108,7 +108,7 @@ export default function GalleryPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading gallery items...</p>
+            <p className="text-gray-600">Memuat item galeri...</p>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function GalleryPage() {
           <Link href="/gallery/create">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add New Item
+              Tambah Item Baru
             </Button>
           </Link>
         </div>
@@ -137,7 +137,7 @@ export default function GalleryPage() {
               <p className="text-lg font-semibold">{error}</p>
             </div>
             <Button onClick={loadGalleryItems} variant="outline">
-              Try Again
+              Coba Lagi
             </Button>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function GalleryPage() {
           <Link href="/gallery/add-image">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add New Item
+              Tambah Item Baru
             </Button>
           </Link>
         </div>
@@ -167,12 +167,12 @@ export default function GalleryPage() {
         <div className="bg-white rounded-lg border shadow-sm p-8">
           <div className="flex flex-col items-center justify-center py-12">
             <Camera className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No gallery items yet</h3>
-            <p className="text-gray-600 mb-4">Get started by creating your first gallery item.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Belum ada item galeri</h3>
+            <p className="text-gray-600 mb-4">Mulai dengan membuat item galeri pertama Anda.</p>
             <Link href="/gallery/add-image">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Create First Item
+                Buat Item Pertama
               </Button>
             </Link>
           </div>

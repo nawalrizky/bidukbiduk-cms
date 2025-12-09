@@ -68,8 +68,8 @@ export default function SocmedAnalyticsPage() {
       console.error('Error loading analytics:', error);
       addNotification({
         type: 'error',
-        title: 'Failed to load analytics',
-        message: 'Unable to load Instagram analytics data'
+        title: 'Gagal memuat analitik',
+        message: 'Tidak dapat memuat data analitik Instagram'
       });
     } finally {
       setLoading(false);
@@ -215,7 +215,7 @@ export default function SocmedAnalyticsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading analytics data...</p>
+          <p className="text-gray-600">Memuat data analitik...</p>
         </div>
       </div>
     );
@@ -225,7 +225,7 @@ export default function SocmedAnalyticsPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-gray-600">No analytics data available</p>
+          <p className="text-gray-600">Tidak ada data analitik tersedia</p>
         </div>
       </div>
     );
@@ -249,12 +249,12 @@ export default function SocmedAnalyticsPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Social Media Analytics</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Analitik Media Sosial</h1>
           <p className="text-gray-600">
-            Track and analyze your Instagram performance
+            Lacak dan analisis performa Instagram Anda
             {totalCount > 0 && (
               <span className="ml-2 text-sm font-medium text-blue-600">
-                • {totalCount} total snapshots
+                • {totalCount} total snapshot
               </span>
             )}
           </p>
@@ -273,13 +273,13 @@ export default function SocmedAnalyticsPage() {
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Disconnect
+                Putuskan
               </Button>
             </div>
           )}
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            Ekspor
           </Button>
           <Button variant="outline" size="sm" className="px-3">
             <ChevronDown className="h-4 w-4" />
@@ -291,7 +291,7 @@ export default function SocmedAnalyticsPage() {
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-500" />
-          <span className="text-sm text-gray-600">View by:</span>
+          <span className="text-sm text-gray-600">Tampilkan berdasarkan:</span>
         </div>
         <div className="flex border rounded-md">
           <button
@@ -302,7 +302,7 @@ export default function SocmedAnalyticsPage() {
                 : 'text-gray-600 hover:bg-gray-50 hover:rounded-l-md'
             }`}
           >
-            Daily
+            Harian
           </button>
           <button
             onClick={() => setViewType('weekly')}
@@ -312,7 +312,7 @@ export default function SocmedAnalyticsPage() {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            Weekly
+            Mingguan
           </button>
           <button
             onClick={() => setViewType('monthly')}
@@ -322,7 +322,7 @@ export default function SocmedAnalyticsPage() {
                 : 'text-gray-600 hover:bg-gray-50 hover:rounded-r-md'
             }`}
           >
-            Monthly
+            Bulanan
           </button>
         </div>
       </div>
@@ -332,11 +332,11 @@ export default function SocmedAnalyticsPage() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center space-x-2">
             <Calendar className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filter by Date:</span>
+            <span className="text-sm font-medium text-gray-700">Filter berdasarkan Tanggal:</span>
           </div>
           
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">From:</label>
+            <label className="text-sm text-gray-600">Dari:</label>
             <input
               type="date"
               value={filters.start_date || ''}
@@ -346,7 +346,7 @@ export default function SocmedAnalyticsPage() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">To:</label>
+            <label className="text-sm text-gray-600">Sampai:</label>
             <input
               type="date"
               value={filters.end_date || ''}
@@ -356,13 +356,13 @@ export default function SocmedAnalyticsPage() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">Month:</label>
+            <label className="text-sm text-gray-600">Bulan:</label>
             <select
               value={filters.month || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, month: e.target.value ? parseInt(e.target.value) : undefined }))}
               className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Months</option>
+              <option value="">Semua Bulan</option>
               {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
                 <option key={m} value={m}>{new Date(2000, m-1).toLocaleString('default', { month: 'long' })}</option>
               ))}
@@ -370,13 +370,13 @@ export default function SocmedAnalyticsPage() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">Year:</label>
+            <label className="text-sm text-gray-600">Tahun:</label>
             <select
               value={filters.year || ''}
               onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value ? parseInt(e.target.value) : undefined }))}
               className="px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Years</option>
+              <option value="">Semua Tahun</option>
               {[2025, 2024, 2023].map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
@@ -390,7 +390,7 @@ export default function SocmedAnalyticsPage() {
               onClick={() => setFilters({ month: undefined, year: undefined, start_date: undefined, end_date: undefined })}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
-              Clear Filters
+              Hapus Filter
             </Button>
           )}
         </div>
@@ -398,11 +398,11 @@ export default function SocmedAnalyticsPage() {
 
       {/* Audience Section */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Audience</h2>
+        <h2 className="text-lg font-semibold mb-4">Audiens</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {/* Followers Card */}
           <Card className="p-6">
-            <div className="text-sm text-gray-600 mb-1">Followers</div>
+            <div className="text-sm text-gray-600 mb-1">Pengikut</div>
             <div className="text-3xl font-bold mb-2">
               {metrics.currentFollowers.toLocaleString()}
             </div>
@@ -410,7 +410,7 @@ export default function SocmedAnalyticsPage() {
 
           {/* Follower Change Card */}
           <Card className="p-6">
-            <div className="text-sm text-gray-600 mb-1">Follower Change</div>
+            <div className="text-sm text-gray-600 mb-1">Perubahan Pengikut</div>
             <div className="flex items-baseline space-x-2 mb-2">
               <span className={`text-3xl font-bold ${
                 metrics.followerChange >= 0 ? 'text-green-600' : 'text-red-600'
@@ -432,7 +432,7 @@ export default function SocmedAnalyticsPage() {
 
           {/* Max Follower Change Card */}
           <Card className="p-6">
-            <div className="text-sm text-gray-600 mb-1">Max. Follower Change</div>
+            <div className="text-sm text-gray-600 mb-1">Perubahan Pengikut Maks.</div>
             <div className="text-3xl font-bold mb-1">
               {metrics.maxFollowerChange.toLocaleString()}
             </div>
@@ -447,7 +447,7 @@ export default function SocmedAnalyticsPage() {
 
           {/* Avg Follower Change Card */}
           <Card className="p-6">
-            <div className="text-sm text-gray-600 mb-1">Avg. Follower Change</div>
+            <div className="text-sm text-gray-600 mb-1">Rata-rata Perubahan Pengikut</div>
             <div className="text-3xl font-bold">
               {metrics.avgFollowerChange >= 0 ? '+' : ''}{metrics.avgFollowerChange}
             </div>
@@ -456,18 +456,18 @@ export default function SocmedAnalyticsPage() {
          {/* Additional Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">Posts</h3>
+          <h3 className="font-semibold mb-4">Postingan</h3>
           <div className="text-2xl font-bold">{metrics.currentPosts}</div>
-          <p className="text-sm text-gray-500 mt-1">Total media posts</p>
+          <p className="text-sm text-gray-500 mt-1">Total postingan media</p>
         </Card>
         
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">Total Engagement</h3>
+          <h3 className="font-semibold mb-4">Total Keterlibatan</h3>
           <div className="text-2xl font-bold">
             {(metrics.currentLikes + metrics.currentComments).toLocaleString()}
           </div>
           <p className="text-sm text-gray-500 mt-1">
-            {metrics.currentLikes.toLocaleString()} likes, {metrics.currentComments.toLocaleString()} comments
+            {metrics.currentLikes.toLocaleString()} suka, {metrics.currentComments.toLocaleString()} komentar
           </p>
         </Card>
       </div>
@@ -475,7 +475,7 @@ export default function SocmedAnalyticsPage() {
         {/* Followers Chart */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold">Followers Growth</h3>
+            <h3 className="font-semibold">Pertumbuhan Pengikut</h3>
             
           </div>
           

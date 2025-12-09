@@ -74,7 +74,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
       setError(null)
     } catch (err) {
       console.error('Error loading gallery item:', err)
-      setError('Failed to load gallery item')
+      setError('Gagal memuat item galeri')
     } finally {
       setLoading(false)
     }
@@ -106,12 +106,12 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
 
   const handleSave = async () => {
     if (!formData.title.trim()) {
-      setError('Title is required')
+      setError('Judul wajib diisi')
       return
     }
     
     if (!formData.category || formData.category === 0) {
-      setError('Please select a category')
+      setError('Silakan pilih kategori')
       return
     }
 
@@ -125,7 +125,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
       router.push(`/gallery/${id}`)
     } catch (err) {
       console.error('Error updating gallery item:', err)
-      setError('Failed to update gallery item')
+      setError('Gagal memperbarui item galeri')
     } finally {
       setSaving(false)
     }
@@ -140,7 +140,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
       router.push('/gallery')
     } catch (err) {
       console.error('Error deleting gallery item:', err)
-      setError('Failed to delete gallery item')
+      setError('Gagal menghapus item galeri')
     } finally {
       setDeleting(false)
       setShowDeleteModal(false)
@@ -165,13 +165,13 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gallery Item</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Item Galeri</h1>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading gallery item...</p>
+            <p className="text-gray-600">Memuat item galeri...</p>
           </div>
         </div>
       </div>
@@ -188,7 +188,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gallery Item</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Item Galeri</h1>
           </div>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -197,7 +197,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
               <p className="text-lg font-semibold">{error}</p>
             </div>
             <Button onClick={loadItem} variant="outline">
-              Try Again
+              Coba Lagi
             </Button>
           </div>
         </div>
@@ -218,10 +218,10 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
           </Link>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {editMode ? 'Edit Gallery Item' : item.title}
+              {editMode ? 'Edit Item Galeri' : item.title}
             </h1>
             <p className="text-gray-600">
-              {editMode ? 'Modify gallery item details' : 'Gallery item details'}
+              {editMode ? 'Ubah detail item galeri' : 'Detail item galeri'}
             </p>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
             </Button>
             <Button variant="destructive" onClick={() => setShowDeleteModal(true)} disabled={saving}>
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              Hapus
             </Button>
           </div>
         )}
@@ -250,7 +250,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
         {/* Image */}
         <Card>
           <CardHeader>
-            <CardTitle>Image</CardTitle>
+            <CardTitle>Gambar</CardTitle>
           </CardHeader>
           <CardContent>
             {(editMode ? formData.file || formData.imageUrl : item.file_url || item.file) ? (
@@ -266,7 +266,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
               </div>
             ) : (
               <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                <p className="text-gray-500">No image available</p>
+                <p className="text-gray-500">Tidak ada gambar tersedia</p>
               </div>
             )}
           </CardContent>
@@ -275,7 +275,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
         {/* Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Details</CardTitle>
+            <CardTitle>Detail</CardTitle>
           </CardHeader>
           <CardContent>
             {editMode ? (
@@ -283,7 +283,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 {/* Title */}
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                    Title *
+                    Judul *
                   </label>
                   <input
                     type="text"
@@ -299,7 +299,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 {/* Description */}
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
+                    Deskripsi
                   </label>
                   <textarea
                     id="description"
@@ -314,7 +314,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 {/* Category */}
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                    Category *
+                    Kategori *
                   </label>
                   <select
                     id="category"
@@ -335,7 +335,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 {/* Image URL */}
                 <div>
                   <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
+                    URL Gambar
                   </label>
                   <input
                     type="url"
@@ -351,7 +351,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 <div className="flex space-x-3 pt-4">
                   <Button onClick={handleSave} disabled={saving}>
                     <Save className="mr-2 h-4 w-4" />
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -368,7 +368,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                       })
                     }}
                   >
-                    Cancel
+                    Batal
                   </Button>
                 </div>
               </div>
@@ -383,34 +383,34 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 
                 <div>
                   <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    {item.category_name || `Category ${item.category}`}
+                    {item.category_name || `Kategori ${item.category}`}
                   </span>
                 </div>
                 
                 <div className="text-sm text-gray-500 space-y-1">
                   <p><strong>ID:</strong> {item.id}</p>
                   {item.media_type && (
-                    <p><strong>Media Type:</strong> {item.media_type}</p>
+                    <p><strong>Jenis Media:</strong> {item.media_type}</p>
                   )}
                   {item.tags && (
-                    <p><strong>Tags:</strong> {item.tags}</p>
+                    <p><strong>Tag:</strong> {item.tags}</p>
                   )}
                   {item.uploaded_by_name && (
-                    <p><strong>Uploaded by:</strong> {item.uploaded_by_name}</p>
+                    <p><strong>Diunggah oleh:</strong> {item.uploaded_by_name}</p>
                   )}
                   {item.is_featured && (
-                    <p><strong>Featured:</strong> Yes</p>
+                    <p><strong>Unggulan:</strong> Ya</p>
                   )}
                   {item.created_at && (
-                    <p><strong>Created:</strong> {new Date(item.created_at).toLocaleString()}</p>
+                    <p><strong>Dibuat:</strong> {new Date(item.created_at).toLocaleString()}</p>
                   )}
                   {item.updated_at && (
-                    <p><strong>Updated:</strong> {new Date(item.updated_at).toLocaleString()}</p>
+                    <p><strong>Diperbarui:</strong> {new Date(item.updated_at).toLocaleString()}</p>
                   )}
                   {(item.file_url || item.file) && (
-                    <p><strong>Image URL:</strong> 
+                    <p><strong>URL Gambar:</strong> 
                       <a href={item.file_url || item.file} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
-                        View Original
+                        Lihat Asli
                       </a>
                     </p>
                   )}
@@ -425,9 +425,9 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Delete Gallery Item</h3>
+            <h3 className="text-lg font-semibold mb-4">Hapus Item Galeri</h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete &ldquo;{item.title}&rdquo;? This action cannot be undone.
+              Apakah Anda yakin ingin menghapus &ldquo;{item.title}&rdquo;? Tindakan ini tidak dapat dibatalkan.
             </p>
             <div className="flex space-x-4 justify-end">
               <Button 
@@ -435,7 +435,7 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 onClick={() => setShowDeleteModal(false)}
                 disabled={deleting}
               >
-                Cancel
+                Batal
               </Button>
               <Button 
                 variant="destructive" 
@@ -445,12 +445,12 @@ export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
                 {deleting ? (
                   <>
                     <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent"></div>
-                    Deleting...
+                    Menghapus...
                   </>
                 ) : (
                   <>
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    Hapus
                   </>
                 )}
               </Button>

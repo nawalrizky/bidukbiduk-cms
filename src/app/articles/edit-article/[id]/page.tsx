@@ -69,8 +69,8 @@ export default function EditArticlePage() {
         console.error('Error loading article:', error)
         addNotification({
           type: 'error',
-          title: 'Failed to load article',
-          message: 'Unable to load article details.'
+          title: 'Gagal memuat artikel',
+          message: 'Tidak dapat memuat detail artikel.'
         })
       } finally {
         setLoading(false)
@@ -92,8 +92,8 @@ export default function EditArticlePage() {
     if (!formData.title.trim()) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Title is required'
+        title: 'Kesalahan Validasi',
+        message: 'Judul wajib diisi'
       })
       return
     }
@@ -101,8 +101,8 @@ export default function EditArticlePage() {
     if (!formData.content.trim()) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Content is required'
+        title: 'Kesalahan Validasi',
+        message: 'Konten wajib diisi'
       })
       return
     }
@@ -110,8 +110,8 @@ export default function EditArticlePage() {
     if (formData.category === 0) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Please select a category'
+        title: 'Kesalahan Validasi',
+        message: 'Silakan pilih kategori'
       })
       return
     }
@@ -147,7 +147,7 @@ export default function EditArticlePage() {
 
       addNotification({
         type: 'success',
-        title: 'Article Updated',
+        title: 'Artikel Diperbarui',
         message: message
       })
 
@@ -157,7 +157,7 @@ export default function EditArticlePage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
       addNotification({
         type: 'error',
-        title: 'Failed to update article',
+        title: 'Gagal memperbarui artikel',
         message: errorMessage
       })
     } finally {
@@ -171,7 +171,7 @@ export default function EditArticlePage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading article...</p>
+          <p className="text-gray-600">Memuat artikel...</p>
         </div>
       </div>
     )
@@ -180,10 +180,10 @@ export default function EditArticlePage() {
   if (!article) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Article not found</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Artikel tidak ditemukan</h3>
         <Button onClick={() => router.push('/articles')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Articles
+          Kembali ke Artikel
         </Button>
       </div>
     )
@@ -194,12 +194,12 @@ export default function EditArticlePage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Article</h1>
-          <p className="text-gray-600">Update article details</p>
+          <h1 className="text-3xl font-bold tracking-tight">Edit Artikel</h1>
+          <p className="text-gray-600">Perbarui detail artikel</p>
         </div>
         <Button variant="outline" onClick={() => router.push(`/articles/${article.id}`)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Cancel
+          Batal
         </Button>
       </div>
 
@@ -209,10 +209,10 @@ export default function EditArticlePage() {
           <div className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Judul *</Label>
               <Input
                 id="title"
-                placeholder="Enter article title"
+                placeholder="Masukkan judul artikel"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 required
@@ -221,7 +221,7 @@ export default function EditArticlePage() {
 
             {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">Kategori *</Label>
               <select
                 id="category"
                 value={formData.category}
@@ -229,7 +229,7 @@ export default function EditArticlePage() {
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               >
-                <option value={0}>Select a category</option>
+                <option value={0}>Pilih kategori</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -240,7 +240,7 @@ export default function EditArticlePage() {
 
             {/* Featured Image */}
             <MediaUploader
-              label="Featured Image"
+              label="Gambar Utama"
               acceptImages={true}
               acceptVideos={false}
               multiple={false}
@@ -254,10 +254,10 @@ export default function EditArticlePage() {
 
             {/* Content */}
             <div className="space-y-2">
-              <Label htmlFor="content">Content *</Label>
+              <Label htmlFor="content">Konten *</Label>
               <Textarea
                 id="content"
-                placeholder="Write your article content here..."
+                placeholder="Tulis konten artikel Anda di sini..."
                 value={formData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 rows={15}
@@ -266,21 +266,21 @@ export default function EditArticlePage() {
                 required
               />
               <p className="text-sm text-gray-500">
-                Formatting preserved (spaces, enters, etc.). {formData.content.length} characters
+                Formatting dipertahankan (spasi, enter, dll.). {formData.content.length} karakter
               </p>
             </div>
 
             {/* Tags */}
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
+              <Label htmlFor="tags">Tag</Label>
               <Input
                 id="tags"
-                placeholder="Enter tags separated by commas (e.g., travel, culture, food)"
+                placeholder="Masukkan tag dipisahkan dengan koma (contoh: wisata, budaya, makanan)"
                 value={formData.tags}
                 onChange={(e) => handleInputChange('tags', e.target.value)}
               />
               <p className="text-sm text-gray-500">
-                Separate multiple tags with commas
+                Pisahkan beberapa tag dengan koma
               </p>
             </div>
 
@@ -329,7 +329,7 @@ export default function EditArticlePage() {
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    Update & Publish
+                    Perbarui & Terbitkan
                   </>
                 )}
               </Button>

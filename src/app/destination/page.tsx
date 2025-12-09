@@ -59,8 +59,8 @@ export default function DestinationPage() {
       console.error('Error loading destinations:', error);
       addNotification({
         type: 'error',
-        title: 'Failed to load destinations',
-        message: 'Unable to load destinations. Please try again.'
+        title: 'Gagal memuat destinasi',
+        message: 'Tidak dapat memuat destinasi. Silakan coba lagi.'
       });
     } finally {
       setLoading(false);
@@ -80,8 +80,8 @@ export default function DestinationPage() {
       
       addNotification({
         type: 'success',
-        title: 'Destination Deleted',
-        message: `Destination "${deleteModal.itemToDelete.name}" has been deleted successfully`
+        title: 'Destinasi Dihapus',
+        message: `Destinasi "${deleteModal.itemToDelete.name}" telah berhasil dihapus`
       });
       
       deleteModal.closeModal();
@@ -91,7 +91,7 @@ export default function DestinationPage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       addNotification({
         type: 'error',
-        title: 'Failed to delete destination',
+        title: 'Gagal menghapus destinasi',
         message: errorMessage
       });
     } finally {
@@ -115,8 +115,8 @@ export default function DestinationPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Destination Management</h1>
-            <p className="text-gray-600 mt-2">Loading destinations...</p>
+            <h1 className="text-3xl font-bold text-gray-900">Manajemen Destinasi</h1>
+            <p className="text-gray-600 mt-2">Memuat destinasi...</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -141,9 +141,9 @@ export default function DestinationPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Destination Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Manajemen Destinasi</h1>
           <p className="text-gray-600 mt-2">
-            Manage travel destinations and locations ({destinations.length} total)
+            Kelola destinasi dan lokasi wisata ({destinations.length} total)
           </p>
         </div>
         <div className="flex items-center space-x-3">
@@ -153,14 +153,14 @@ export default function DestinationPage() {
             onClick={() => router.push('/destination/categories')}
           >
             <FolderOpen className="h-4 w-4" />
-            <span>Manage Categories</span>
+            <span>Kelola Kategori</span>
           </Button>
           <Button 
             className="flex items-center space-x-2"
             onClick={() => router.push('/destination/add-destination')}
           >
             <Plus className="h-4 w-4" />
-            <span>Add Destination</span>
+            <span>Tambah Destinasi</span>
           </Button>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function DestinationPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder="Search destinations..."
+                placeholder="Cari destinasi..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -188,7 +188,7 @@ export default function DestinationPage() {
                 onChange={(e) => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All Categories</option>
+                <option value="">Semua Kategori</option>
                 {categories.map(category => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -203,7 +203,7 @@ export default function DestinationPage() {
       {/* Results Summary */}
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>
-          Showing {filteredDestinations.length} of {destinations.length} destinations
+          Menampilkan {filteredDestinations.length} dari {destinations.length} destinasi
         </span>
        
       </div>
@@ -213,11 +213,11 @@ export default function DestinationPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No destinations found</p>
+            <p className="text-gray-500 text-lg">Tidak ada destinasi ditemukan</p>
             <p className="text-gray-400 text-sm mt-2">
               {searchTerm || selectedCategory
-                ? 'Try adjusting your filters' 
-                : 'Get started by adding your first destination'
+                ? 'Coba sesuaikan filter Anda' 
+                : 'Mulai dengan menambahkan destinasi pertama Anda'
               }
             </p>
           </CardContent>
@@ -244,7 +244,7 @@ export default function DestinationPage() {
                         setSelectedDestination(destination);
                         setShowDetailModal(true);
                       }}
-                      title="View Details"
+                      title="Lihat Detail"
                     >
                       <Info className="h-4 w-4" />
                     </Button>

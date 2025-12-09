@@ -5,32 +5,32 @@ import { BarChart3, FileText, Users, TrendingUp } from 'lucide-react'
 
 const stats = [
   {
-    title: "Total Content",
+    title: "Total Konten",
     value: "156",
-    description: "Published articles",
+    description: "Artikel yang diterbitkan",
     icon: FileText,
-    trend: "+12% from last month"
+    trend: "+12% dari bulan lalu"
   },
   {
-    title: "Page Views",
+    title: "Tayangan Halaman",
     value: "24,567",
-    description: "This month",
+    description: "Bulan ini",
     icon: BarChart3,
-    trend: "+18% from last month"
+    trend: "+18% dari bulan lalu"
   },
   {
-    title: "Active Users",
+    title: "Pengguna Aktif",
     value: "1,234",
-    description: "Monthly active users",
+    description: "Pengguna aktif bulanan",
     icon: Users,
-    trend: "+8% from last month"
+    trend: "+8% dari bulan lalu"
   },
   {
-    title: "Engagement Rate",
+    title: "Tingkat Keterlibatan",
     value: "68%",
-    description: "Average engagement",
+    description: "Keterlibatan rata-rata",
     icon: TrendingUp,
-    trend: "+5% from last month"
+    trend: "+5% dari bulan lalu"
   }
 ]
 
@@ -41,7 +41,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <p className="text-gray-600">
-            Overview of your content management system
+            Ringkasan sistem manajemen konten Anda
           </p>
         </div>
         
@@ -70,9 +70,9 @@ export default function DashboardPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Aktivitas Terkini</CardTitle>
               <CardDescription>
-                Latest content updates and user actions
+                Pembaruan konten dan aksi pengguna terbaru
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -80,22 +80,22 @@ export default function DashboardPage() {
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-sm">New article published: &ldquo;Boat Safety Tips&rdquo;</p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
+                    <p className="text-sm">Artikel baru diterbitkan: &ldquo;Tips Keselamatan Perahu&rdquo;</p>
+                    <p className="text-xs text-gray-500">2 jam yang lalu</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-sm">User profile updated</p>
-                    <p className="text-xs text-gray-500">4 hours ago</p>
+                    <p className="text-sm">Profil pengguna diperbarui</p>
+                    <p className="text-xs text-gray-500">4 jam yang lalu</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="text-sm">Content moderation required</p>
-                    <p className="text-xs text-gray-500">6 hours ago</p>
+                    <p className="text-sm">Moderasi konten diperlukan</p>
+                    <p className="text-xs text-gray-500">6 jam yang lalu</p>
                   </div>
                 </div>
               </div>
@@ -104,24 +104,24 @@ export default function DashboardPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Aksi Cepat</CardTitle>
               <CardDescription>
-                Common tasks and shortcuts
+                Tugas umum dan pintasan
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="font-medium">Create New Article</div>
-                  <div className="text-sm text-gray-500">Start writing a new blog post</div>
+                  <div className="font-medium">Buat Artikel Baru</div>
+                  <div className="text-sm text-gray-500">Mulai menulis postingan blog baru</div>
                 </button>
                 <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="font-medium">Manage Users</div>
-                  <div className="text-sm text-gray-500">View and edit user accounts</div>
+                  <div className="font-medium">Kelola Pengguna</div>
+                  <div className="text-sm text-gray-500">Lihat dan edit akun pengguna</div>
                 </button>
                 <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="font-medium">View Analytics</div>
-                  <div className="text-sm text-gray-500">Check detailed performance metrics</div>
+                  <div className="font-medium">Lihat Analitik</div>
+                  <div className="text-sm text-gray-500">Periksa metrik performa detail</div>
                 </button>
               </div>
             </CardContent>

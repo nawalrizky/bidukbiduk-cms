@@ -42,8 +42,8 @@ export default function AddArticlePage() {
         console.error('Error loading categories:', error)
         addNotification({
           type: 'error',
-          title: 'Failed to load categories',
-          message: 'Unable to load article categories.'
+          title: 'Gagal memuat kategori',
+          message: 'Tidak dapat memuat kategori artikel.'
         })
       }
     }
@@ -61,8 +61,8 @@ export default function AddArticlePage() {
     if (!formData.title.trim()) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Title is required'
+        title: 'Kesalahan Validasi',
+        message: 'Judul wajib diisi'
       })
       return
     }
@@ -70,8 +70,8 @@ export default function AddArticlePage() {
     if (!formData.content.trim()) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Content is required'
+        title: 'Kesalahan Validasi',
+        message: 'Konten wajib diisi'
       })
       return
     }
@@ -79,8 +79,8 @@ export default function AddArticlePage() {
     if (formData.category === 0) {
       addNotification({
         type: 'error',
-        title: 'Validation Error',
-        message: 'Please select a category'
+        title: 'Kesalahan Validasi',
+        message: 'Silakan pilih kategori'
       })
       return
     }
@@ -111,7 +111,7 @@ export default function AddArticlePage() {
 
       addNotification({
         type: 'success',
-        title: 'Article Created',
+        title: 'Artikel Dibuat',
         message: message
       })
 
@@ -121,7 +121,7 @@ export default function AddArticlePage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
       addNotification({
         type: 'error',
-        title: 'Failed to create article',
+        title: 'Gagal membuat artikel',
         message: errorMessage
       })
     } finally {
@@ -135,12 +135,12 @@ export default function AddArticlePage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Add New Article</h1>
-          <p className="text-gray-600">Create a new article or blog post</p>
+          <h1 className="text-3xl font-bold tracking-tight">Tambah Artikel Baru</h1>
+          <p className="text-gray-600">Buat artikel atau postingan blog baru</p>
         </div>
         <Button variant="outline" onClick={() => router.push('/articles')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Cancel
+          Batal
         </Button>
       </div>
 
@@ -150,10 +150,10 @@ export default function AddArticlePage() {
           <div className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Judul *</Label>
               <Input
                 id="title"
-                placeholder="Enter article title"
+                placeholder="Masukkan judul artikel"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 required
@@ -162,7 +162,7 @@ export default function AddArticlePage() {
 
             {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">Kategori *</Label>
               <select
                 id="category"
                 value={formData.category}
@@ -170,7 +170,7 @@ export default function AddArticlePage() {
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               >
-                <option value={0}>Select a category</option>
+                <option value={0}>Pilih kategori</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -181,7 +181,7 @@ export default function AddArticlePage() {
 
             {/* Featured Image */}
             <MediaUploader
-              label="Featured Image"
+              label="Gambar Utama"
               acceptImages={true}
               acceptVideos={false}
               multiple={false}
@@ -195,10 +195,10 @@ export default function AddArticlePage() {
 
             {/* Content */}
             <div className="space-y-2">
-              <Label htmlFor="content">Content *</Label>
+              <Label htmlFor="content">Konten *</Label>
               <Textarea
                 id="content"
-                placeholder="Write your article content here..."
+                placeholder="Tulis konten artikel Anda di sini..."
                 value={formData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 rows={15}
@@ -207,21 +207,21 @@ export default function AddArticlePage() {
                 required
               />
               <p className="text-sm text-gray-500">
-                Formatting preserved (spaces, enters, etc.). {formData.content.length} characters
+                Formatting dipertahankan (spasi, enter, dll.). {formData.content.length} karakter
               </p>
             </div>
 
             {/* Tags */}
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
+              <Label htmlFor="tags">Tag</Label>
               <Input
                 id="tags"
-                placeholder="Enter tags separated by commas (e.g., travel, culture, food)"
+                placeholder="Masukkan tag dipisahkan dengan koma (contoh: wisata, budaya, makanan)"
                 value={formData.tags}
                 onChange={(e) => handleInputChange('tags', e.target.value)}
               />
               <p className="text-sm text-gray-500">
-                Separate multiple tags with commas
+                Pisahkan beberapa tag dengan koma
               </p>
             </div>
           </div>

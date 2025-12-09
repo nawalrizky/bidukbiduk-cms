@@ -7,27 +7,27 @@ import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 const mockContent = [
   {
     id: 1,
-    title: "Introduction to Traditional Boats",
-    type: "Article",
-    status: "Published",
+    title: "Pengenalan Perahu Tradisional",
+    type: "Artikel",
+    status: "Diterbitkan",
     author: "John Doe",
     date: "2024-03-15",
     views: 1250
   },
   {
     id: 2,
-    title: "Boat Maintenance Guide",
-    type: "Guide",
-    status: "Draft",
+    title: "Panduan Perawatan Perahu",
+    type: "Panduan",
+    status: "Draf",
     author: "Jane Smith",
     date: "2024-03-14",
     views: 0
   },
   {
     id: 3,
-    title: "Fishing Techniques",
+    title: "Teknik Memancing",
     type: "Tutorial",
-    status: "Published",
+    status: "Diterbitkan",
     author: "Mike Johnson",
     date: "2024-03-13",
     views: 890
@@ -40,22 +40,22 @@ export default function ContentPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Content Management</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Manajemen Konten</h2>
             <p className="text-gray-600">
-              Manage your articles, guides, and tutorials
+              Kelola artikel, panduan, dan tutorial Anda
             </p>
           </div>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            New Content
+            Konten Baru
           </Button>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle>Content Library</CardTitle>
+            <CardTitle>Perpustakaan Konten</CardTitle>
             <CardDescription>
-              All your published and draft content
+              Semua konten yang diterbitkan dan draf Anda
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -67,15 +67,15 @@ export default function ContentPage() {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                       <span className="bg-gray-100 px-2 py-1 rounded">{item.type}</span>
                       <span className={`px-2 py-1 rounded ${
-                        item.status === 'Published' 
+                        item.status === 'Diterbitkan' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
                         {item.status}
                       </span>
-                      <span>By {item.author}</span>
+                      <span>Oleh {item.author}</span>
                       <span>{item.date}</span>
-                      <span>{item.views} views</span>
+                      <span>{item.views} tayangan</span>
                     </div>
                   </div>
                   
@@ -99,20 +99,20 @@ export default function ContentPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Stats</CardTitle>
+              <CardTitle className="text-lg">Statistik Cepat</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Total Articles</span>
+                  <span className="text-sm text-gray-600">Total Artikel</span>
                   <span className="font-semibold">156</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Published</span>
+                  <span className="text-sm text-gray-600">Diterbitkan</span>
                   <span className="font-semibold">142</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Drafts</span>
+                  <span className="text-sm text-gray-600">Draf</span>
                   <span className="font-semibold">14</span>
                 </div>
               </div>
@@ -121,20 +121,20 @@ export default function ContentPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Content Types</CardTitle>
+              <CardTitle className="text-lg">Jenis Konten</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Articles</span>
+                  <span className="text-sm text-gray-600">Artikel</span>
                   <span className="font-semibold">89</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Guides</span>
+                  <span className="text-sm text-gray-600">Panduan</span>
                   <span className="font-semibold">45</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Tutorials</span>
+                  <span className="text-sm text-gray-600">Tutorial</span>
                   <span className="font-semibold">22</span>
                 </div>
               </div>
@@ -143,21 +143,21 @@ export default function ContentPage() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Recent Activity</CardTitle>
+              <CardTitle className="text-lg">Aktivitas Terkini</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="text-sm">
-                  <div className="font-medium">Article published</div>
-                  <div className="text-gray-500">2 hours ago</div>
+                  <div className="font-medium">Artikel diterbitkan</div>
+                  <div className="text-gray-500">2 jam yang lalu</div>
                 </div>
                 <div className="text-sm">
-                  <div className="font-medium">Draft saved</div>
-                  <div className="text-gray-500">4 hours ago</div>
+                  <div className="font-medium">Draf disimpan</div>
+                  <div className="text-gray-500">4 jam yang lalu</div>
                 </div>
                 <div className="text-sm">
-                  <div className="font-medium">Content updated</div>
-                  <div className="text-gray-500">1 day ago</div>
+                  <div className="font-medium">Konten diperbarui</div>
+                  <div className="text-gray-500">1 hari yang lalu</div>
                 </div>
               </div>
             </CardContent>

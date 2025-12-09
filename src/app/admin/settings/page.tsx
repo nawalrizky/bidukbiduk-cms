@@ -6,47 +6,47 @@ import { Settings, User, Shield, Globe, Bell, Database } from 'lucide-react'
 
 const settingsCategories = [
   {
-    title: "General Settings",
-    description: "Basic site configuration and preferences",
+    title: "Pengaturan Umum",
+    description: "Konfigurasi dasar situs dan preferensi",
     icon: Settings,
     items: [
-      { label: "Site Name", value: "BidukBiduk CMS" },
-      { label: "Site Description", value: "Traditional boat content management" },
-      { label: "Admin Email", value: "admin@bidukbiduk.com" },
-      { label: "Timezone", value: "UTC+7 (Jakarta)" }
+      { label: "Nama Situs", value: "BidukBiduk CMS" },
+      { label: "Deskripsi Situs", value: "Manajemen konten perahu tradisional" },
+      { label: "Email Admin", value: "admin@bidukbiduk.com" },
+      { label: "Zona Waktu", value: "UTC+7 (Jakarta)" }
     ]
   },
   {
-    title: "User Management",
-    description: "Manage user roles and permissions",
+    title: "Manajemen Pengguna",
+    description: "Kelola peran dan izin pengguna",
     icon: User,
     items: [
-      { label: "Default User Role", value: "Contributor" },
-      { label: "Registration", value: "Admin Approval Required" },
-      { label: "Password Policy", value: "Strong (8+ chars, mixed case)" },
-      { label: "Session Timeout", value: "24 hours" }
+      { label: "Peran Pengguna Default", value: "Kontributor" },
+      { label: "Registrasi", value: "Persetujuan Admin Diperlukan" },
+      { label: "Kebijakan Kata Sandi", value: "Kuat (8+ karakter, campuran huruf)" },
+      { label: "Waktu Habis Sesi", value: "24 jam" }
     ]
   },
   {
-    title: "Security",
-    description: "Security and privacy settings",
+    title: "Keamanan",
+    description: "Pengaturan keamanan dan privasi",
     icon: Shield,
     items: [
-      { label: "Two-Factor Auth", value: "Enabled" },
-      { label: "Login Attempts", value: "5 max attempts" },
-      { label: "IP Whitelist", value: "Disabled" },
-      { label: "SSL Certificate", value: "Active" }
+      { label: "Autentikasi Dua Faktor", value: "Diaktifkan" },
+      { label: "Percobaan Masuk", value: "Maksimal 5 percobaan" },
+      { label: "Daftar Putih IP", value: "Dinonaktifkan" },
+      { label: "Sertifikat SSL", value: "Aktif" }
     ]
   },
   {
-    title: "Content Settings",
-    description: "Content publishing and moderation",
+    title: "Pengaturan Konten",
+    description: "Penerbitan konten dan moderasi",
     icon: Globe,
     items: [
-      { label: "Auto-publish", value: "Disabled" },
-      { label: "Content Moderation", value: "Manual Review" },
-      { label: "SEO Optimization", value: "Enabled" },
-      { label: "Comment System", value: "Enabled with Moderation" }
+      { label: "Terbitkan Otomatis", value: "Dinonaktifkan" },
+      { label: "Moderasi Konten", value: "Tinjauan Manual" },
+      { label: "Optimasi SEO", value: "Diaktifkan" },
+      { label: "Sistem Komentar", value: "Diaktifkan dengan Moderasi" }
     ]
   }
 ]
@@ -56,9 +56,9 @@ export default function SettingsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Pengaturan</h2>
           <p className="text-gray-600">
-            Configure your CMS settings and preferences
+            Konfigurasi pengaturan dan preferensi CMS Anda
           </p>
         </div>
         
@@ -99,8 +99,8 @@ export default function SettingsPage() {
               <div className="flex items-center space-x-3">
                 <Bell className="h-5 w-5 text-orange-600" />
                 <div>
-                  <CardTitle className="text-lg">Notifications</CardTitle>
-                  <CardDescription>Manage email and system notifications</CardDescription>
+                  <CardTitle className="text-lg">Notifikasi</CardTitle>
+                  <CardDescription>Kelola notifikasi email dan sistem</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -108,29 +108,29 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Email Notifications</p>
-                    <p className="text-xs text-gray-500">Receive updates via email</p>
+                    <p className="text-sm font-medium">Notifikasi Email</p>
+                    <p className="text-xs text-gray-500">Terima pembaruan melalui email</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Configure
+                    Konfigurasi
                   </Button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Push Notifications</p>
-                    <p className="text-xs text-gray-500">Browser push notifications</p>
+                    <p className="text-sm font-medium">Notifikasi Push</p>
+                    <p className="text-xs text-gray-500">Notifikasi push browser</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Configure
+                    Konfigurasi
                   </Button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Weekly Reports</p>
-                    <p className="text-xs text-gray-500">Automated analytics reports</p>
+                    <p className="text-sm font-medium">Laporan Mingguan</p>
+                    <p className="text-xs text-gray-500">Laporan analitik otomatis</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Configure
+                    Konfigurasi
                   </Button>
                 </div>
               </div>
@@ -142,8 +142,8 @@ export default function SettingsPage() {
               <div className="flex items-center space-x-3">
                 <Database className="h-5 w-5 text-green-600" />
                 <div>
-                  <CardTitle className="text-lg">Data Management</CardTitle>
-                  <CardDescription>Backup and data export options</CardDescription>
+                  <CardTitle className="text-lg">Manajemen Data</CardTitle>
+                  <CardDescription>Opsi backup dan ekspor data</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -151,27 +151,27 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Automatic Backups</p>
-                    <p className="text-xs text-gray-500">Daily at 2:00 AM UTC</p>
+                    <p className="text-sm font-medium">Backup Otomatis</p>
+                    <p className="text-xs text-gray-500">Harian pukul 2:00 AM UTC</p>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Active</span>
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Aktif</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Last Backup</p>
-                    <p className="text-xs text-gray-500">Today at 2:00 AM</p>
+                    <p className="text-sm font-medium">Backup Terakhir</p>
+                    <p className="text-xs text-gray-500">Hari ini pukul 2:00 AM</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Download
+                    Unduh
                   </Button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Export Data</p>
-                    <p className="text-xs text-gray-500">Export all content as JSON/CSV</p>
+                    <p className="text-sm font-medium">Ekspor Data</p>
+                    <p className="text-xs text-gray-500">Ekspor semua konten sebagai JSON/CSV</p>
                   </div>
                   <Button variant="outline" size="sm">
-                    Export
+                    Ekspor
                   </Button>
                 </div>
               </div>
@@ -181,29 +181,29 @@ export default function SettingsPage() {
         
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-red-600">Danger Zone</CardTitle>
+            <CardTitle className="text-lg text-red-600">Zona Berbahaya</CardTitle>
             <CardDescription>
-              Irreversible and destructive actions
+              Tindakan yang tidak dapat dibatalkan dan merusak
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
                 <div>
-                  <p className="text-sm font-medium text-red-800">Reset All Settings</p>
-                  <p className="text-xs text-red-600">Restore all settings to default values</p>
+                  <p className="text-sm font-medium text-red-800">Reset Semua Pengaturan</p>
+                  <p className="text-xs text-red-600">Kembalikan semua pengaturan ke nilai default</p>
                 </div>
                 <Button variant="destructive" size="sm">
-                  Reset Settings
+                  Reset Pengaturan
                 </Button>
               </div>
               <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
                 <div>
-                  <p className="text-sm font-medium text-red-800">Delete All Content</p>
-                  <p className="text-xs text-red-600">Permanently delete all articles and media</p>
+                  <p className="text-sm font-medium text-red-800">Hapus Semua Konten</p>
+                  <p className="text-xs text-red-600">Hapus permanen semua artikel dan media</p>
                 </div>
                 <Button variant="destructive" size="sm">
-                  Delete Content
+                  Hapus Konten
                 </Button>
               </div>
             </div>

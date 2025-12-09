@@ -53,8 +53,8 @@ export default function AddHotelPage() {
     if (!formData.name.trim()) {
       addNotification({
         type: "error",
-        title: "Validation Error",
-        message: "Hotel name is required.",
+        title: "Kesalahan Validasi",
+        message: "Nama amenitas wajib diisi.",
       });
       return;
     }
@@ -62,8 +62,8 @@ export default function AddHotelPage() {
     if (!formData.description.trim()) {
       addNotification({
         type: "error",
-        title: "Validation Error",
-        message: "Hotel description is required.",
+        title: "Kesalahan Validasi",
+        message: "Deskripsi amenitas wajib diisi.",
       });
       return;
     }
@@ -71,8 +71,8 @@ export default function AddHotelPage() {
     if (!formData.price || parseFloat(formData.price) <= 0) {
       addNotification({
         type: "error",
-        title: "Validation Error",
-        message: "Please enter a valid price.",
+        title: "Kesalahan Validasi",
+        message: "Silakan masukkan harga yang valid.",
       });
       return;
     }
@@ -121,8 +121,8 @@ export default function AddHotelPage() {
 
       addNotification({
         type: "success",
-        title: "Hotel created",
-        message: `Hotel "${formData.name}" has been created successfully`,
+        title: "Amenitas dibuat",
+        message: `Amenitas "${formData.name}" telah berhasil dibuat`,
       });
 
       router.push("/hotel");
@@ -131,7 +131,7 @@ export default function AddHotelPage() {
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       addNotification({
         type: "error",
-        title: "Failed to create hotel",
+        title: "Gagal membuat amenitas",
         message: errorMessage,
       });
     } finally {
@@ -148,44 +148,44 @@ export default function AddHotelPage() {
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          Kembali
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Add New Hotel</h1>
-          <p className="text-gray-600">Create a new hotel listing</p>
+          <h1 className="text-3xl font-bold tracking-tight">Tambah Amenitas Baru</h1>
+          <p className="text-gray-600">Buat listing amenitas baru (restoran, cafe, dll)</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          <h2 className="text-xl font-semibold mb-4">Informasi Dasar</h2>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Hotel Name *</Label>
+              <Label htmlFor="name">Nama Amenitas *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                placeholder="Enter hotel name"
+                placeholder="Masukkan nama amenitas (contoh: Restoran, Cafe, dll)"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">Deskripsi *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
-                placeholder="Enter hotel description"
+                placeholder="Masukkan deskripsi amenitas"
                 required
                 rows={4}
               />
             </div>
 
             <div>
-              <Label htmlFor="price">Price (IDR) per night *</Label>
+              <Label htmlFor="price">Harga (IDR) per malam *</Label>
               <Input
                 id="price"
                 type="number"
@@ -193,13 +193,13 @@ export default function AddHotelPage() {
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
-                placeholder="Enter price in IDR"
+                placeholder="Masukkan harga dalam IDR"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="book_url">Booking URL</Label>
+              <Label htmlFor="book_url">URL Pemesanan</Label>
               <Input
                 id="book_url"
                 type="url"
@@ -210,7 +210,7 @@ export default function AddHotelPage() {
             </div>
 
             <div>
-              <Label htmlFor="maps_url">Maps URL</Label>
+              <Label htmlFor="maps_url">URL Peta</Label>
               <Input
                 id="maps_url"
                 type="url"
@@ -221,7 +221,7 @@ export default function AddHotelPage() {
             </div>
 
             <div>
-              <Label htmlFor="price">Price (IDR) per night *</Label>
+              <Label htmlFor="price">Harga (IDR) per malam *</Label>
               <Input
                 id="price"
                 type="number"
@@ -229,14 +229,14 @@ export default function AddHotelPage() {
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
-                placeholder="Enter price in IDR"
+                placeholder="Masukkan harga dalam IDR"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="total_rating">Average Rating</Label>
+                <Label htmlFor="total_rating">Rating Rata-rata</Label>
                 <Input
                   id="total_rating"
                   type="number"
@@ -247,11 +247,11 @@ export default function AddHotelPage() {
                   onChange={(e) => handleInputChange("total_rating", e.target.value)}
                   placeholder="0.0 - 5.0"
                 />
-                <p className="text-xs text-gray-500 mt-1">Rating from 0.0 to 5.0</p>
+                <p className="text-xs text-gray-500 mt-1">Rating dari 0.0 hingga 5.0</p>
               </div>
 
               <div>
-                <Label htmlFor="total_rating_users">Total Reviews</Label>
+                <Label htmlFor="total_rating_users">Total Ulasan</Label>
                 <Input
                   id="total_rating_users"
                   type="number"
@@ -260,7 +260,7 @@ export default function AddHotelPage() {
                   onChange={(e) => handleInputChange("total_rating_users", e.target.value)}
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-500 mt-1">Number of reviews</p>
+                <p className="text-xs text-gray-500 mt-1">Jumlah ulasan</p>
               </div>
             </div>
 
@@ -272,14 +272,14 @@ export default function AddHotelPage() {
                 onChange={(e) => handleInputChange("is_active", e.target.checked)}
                 className="rounded"
               />
-              <Label htmlFor="is_active">Active (visible to public)</Label>
+              <Label htmlFor="is_active">Aktif (terlihat untuk publik)</Label>
             </div>
           </div>
         </Card>
 
         {/* Hotel Images */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Hotel Images</h2>
+          <h2 className="text-xl font-semibold mb-4">Gambar Amenitas</h2>
           <MediaUploader
             label=""
             acceptImages={true}
@@ -299,18 +299,18 @@ export default function AddHotelPage() {
             onClick={() => router.back()}
             disabled={loading}
           >
-            Cancel
+            Batal
           </Button>
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                Membuat...
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Create Hotel
+                Buat Amenitas
               </>
             )}
           </Button>

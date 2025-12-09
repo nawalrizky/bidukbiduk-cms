@@ -49,19 +49,19 @@ export default function AddImagePage() {
     const token = authService.getAccessToken()
     console.log('Form submission: Token check:', !!token)
     if (!token) {
-      setError('You are not authenticated. Please log in again.')
+      setError('Anda tidak terautentikasi. Silakan masuk lagi.')
       router.push('/auth/login')
       return
     }
     
     // Validation
     if (!formData.title.trim()) {
-      setError('Please provide a title for the image')
+      setError('Silakan berikan judul untuk gambar')
       return
     }
     
     if (!mediaFiles[0]) {
-      setError('Please select an image to upload')
+      setError('Silakan pilih gambar untuk diunggah')
       return
     }
     
@@ -98,17 +98,17 @@ export default function AddImagePage() {
           router.push('/gallery')
         }, 1500)
       } else {
-        setError('Failed to upload image. Please try again.')
+        setError('Gagal mengunggah gambar. Silakan coba lagi.')
       }
     } catch (err) {
       console.error('Error uploading image:', err)
       
       // Extract detailed error message
-      let errorMessage = 'Failed to upload image. ';
+      let errorMessage = 'Gagal mengunggah gambar. ';
       if (err instanceof Error) {
         errorMessage += err.message;
       } else {
-        errorMessage += 'Please try again.';
+        errorMessage += 'Silakan coba lagi.';
       }
       
       setError(errorMessage)
@@ -124,7 +124,7 @@ export default function AddImagePage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/gallery">
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Gallery
+              Kembali ke Galeri
             </Link>
           </Button>
         </div>
@@ -134,15 +134,15 @@ export default function AddImagePage() {
         {/* Upload Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Upload Image</CardTitle>
+            <CardTitle>Unggah Gambar</CardTitle>
           </CardHeader>
           <CardContent>
             {success && (
               <Alert className="mb-4 bg-green-50 border-green-200">
                 <Check className="h-4 w-4 text-green-600" />
-                <AlertTitle>Success!</AlertTitle>
+                <AlertTitle>Berhasil!</AlertTitle>
                 <AlertDescription>
-                  Image uploaded successfully. Redirecting to gallery...
+                  Gambar berhasil diunggah. Mengalihkan ke galeri...
                 </AlertDescription>
               </Alert>
             )}
@@ -150,17 +150,17 @@ export default function AddImagePage() {
             {error && (
               <Alert className="mb-4 bg-red-50 border-red-200">
                 <X className="h-4 w-4 text-red-600" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Kesalahan</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Image Title</Label>
+                <Label htmlFor="title">Judul Gambar</Label>
                 <Input
                   id="title"
-                  placeholder="Enter a title for this image"
+                  placeholder="Masukkan judul untuk gambar ini"
                   value={formData.title}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   required
@@ -168,17 +168,17 @@ export default function AddImagePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Deskripsi</Label>
                 <Input
                   id="description"
-                  placeholder="Enter a description for this image"
+                  placeholder="Masukkan deskripsi untuk gambar ini"
                   value={formData.description}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 />
               </div>
 
               <MediaUploader
-                label="Image File"
+                label="File Gambar"
                 acceptImages={true}
                 acceptVideos={false}
                 multiple={false}
@@ -191,10 +191,10 @@ export default function AddImagePage() {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="tags">Tags (optional)</Label>
+                <Label htmlFor="tags">Tag (opsional)</Label>
                 <Input
                   id="tags"
-                  placeholder="nature, landscape, beach (comma separated)"
+                  placeholder="alam, pemandangan, pantai (dipisahkan koma)"
                   value={formData.tags}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
                 />
@@ -209,12 +209,12 @@ export default function AddImagePage() {
                   {loading ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent"></div>
-                      Uploading...
+                      Mengunggah...
                     </>
                   ) : (
                     <>
                       <Camera className="mr-2 h-4 w-4" />
-                      Upload Image
+                      Unggah Gambar
                     </>
                   )}
                 </Button>

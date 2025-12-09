@@ -34,8 +34,8 @@ export default function ArticlesPage() {
       console.error('Error loading articles:', error)
       addNotification({
         type: 'error',
-        title: 'Failed to load articles',
-        message: 'Unable to load articles. Please try again.'
+        title: 'Gagal memuat artikel',
+        message: 'Tidak dapat memuat artikel. Silakan coba lagi.'
       })
       setArticles([])
     } finally {
@@ -60,8 +60,8 @@ export default function ArticlesPage() {
       
       addNotification({
         type: 'success',
-        title: 'Article deleted',
-        message: `Article "${deleteModal.itemToDelete.name}" has been deleted successfully`
+        title: 'Artikel dihapus',
+        message: `Artikel "${deleteModal.itemToDelete.name}" telah berhasil dihapus`
       })
       
       deleteModal.closeModal()
@@ -71,7 +71,7 @@ export default function ArticlesPage() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
       addNotification({
         type: 'error',
-        title: 'Failed to delete article',
+        title: 'Gagal menghapus artikel',
         message: errorMessage
       })
     } finally {
@@ -139,7 +139,7 @@ export default function ArticlesPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading articles...</p>
+            <p className="text-gray-600">Memuat artikel...</p>
           </div>
         </div>
       </div>
@@ -151,8 +151,8 @@ export default function ArticlesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">News & Articles</h1>
-          <p className="text-gray-600">Manage news articles and blog posts</p>
+          <h1 className="text-3xl font-bold tracking-tight">Berita & Artikel</h1>
+          <p className="text-gray-600">Kelola berita dan postingan blog</p>
         </div>
         <div className="flex space-x-2">
           <Button 
@@ -269,7 +269,7 @@ export default function ArticlesPage() {
                         ))}
                         {article.tags_list.length > 3 && (
                           <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                            +{article.tags_list.length - 3} more
+                            +{article.tags_list.length - 3} lagi
                           </span>
                         )}
                       </div>

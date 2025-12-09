@@ -528,7 +528,7 @@ export default function SocmedManagementPage() {
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Putuskan
+                Keluar
                 </Button>
               </div>
             )}
@@ -581,7 +581,7 @@ export default function SocmedManagementPage() {
               // Determine which image to show
               // For videos, try to find thumbnail first
               let imageUrl = fullMediaUrl;
-              let isVideo = post.post_type === 'video' || post.post_type === 'reel';
+              const isVideo = post.post_type === 'video' || post.post_type === 'reel';
               
               if (isVideo && fullMediaUrl) {
                 // Try to extract thumbnail from extras
